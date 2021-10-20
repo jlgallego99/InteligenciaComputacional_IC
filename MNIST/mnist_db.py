@@ -1,6 +1,7 @@
 import urllib.request
 import logging
-import os
+
+logging.basicConfig(level = logging.INFO)
 
 MNIST_URL = "http://yann.lecun.com/exdb/mnist/"
 
@@ -12,7 +13,7 @@ trainingLabels = "train-labels-idx1-ubyte.gz"
 testImages = "t10k-images-idx3-ubyte.gz"
 testLabels = "t10k-labels-idx1-ubyte.gz"
 		
-def descargarMNIST(directorio):
+def descargar_mnist(directorio):
 	logging.info("Descargando base de datos MNIST...")
 	urllib.request.urlretrieve(MNIST_URL + trainingImages, directorio + trainingImages)
 	urllib.request.urlretrieve(MNIST_URL + trainingLabels, directorio + trainingLabels)
@@ -20,8 +21,11 @@ def descargarMNIST(directorio):
 	urllib.request.urlretrieve(MNIST_URL + testLabels, directorio + testLabels)
 	logging.info("Base de datos MNIST descargada en " + directorio)
 
+def read_images():
+	logging.info("Leyendo datos de MNIST...")
+
 def main():
-	descargarMNIST("./data/")
+	descargar_mnist("./data/")
 
 if __name__ == "__main__":
     main()
