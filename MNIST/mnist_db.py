@@ -18,7 +18,7 @@ test_labels = "t10k-labels-idx1-ubyte.gz"
 		
 def descargar_mnist(directorio):
 	logging.info("Descargando base de datos MNIST...")
-	
+
 	urllib.request.urlretrieve(MNIST_URL + training_images, directorio + training_images)
 	urllib.request.urlretrieve(MNIST_URL + training_labels, directorio + training_labels)
 	urllib.request.urlretrieve(MNIST_URL + test_images, directorio + test_images)
@@ -33,10 +33,15 @@ def descargar_mnist(directorio):
 def leer_mnist(directorio):
 	logging.info("Leyendo datos de MNIST...")
 	datos_mnist = MNIST(directorio)
+
+	# Cada imagen es una lista de bytes sin signo
+	# Cada label es un array de bytes sin signo
 	training_images, training_labels = datos_mnist.load_training()
 	test_images, test_labels = datos_mnist.load_testing()
 
-	print(datos_mnist.display(training_images[0]))
+	logging.info("Datos de MNIST listos para usarse")
+
+	# print(datos_mnist.display(training_images[0]))
 
 def main():
 	# descargar_mnist("./data/")
