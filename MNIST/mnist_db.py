@@ -1,8 +1,8 @@
-from os import urandom
 import urllib.request
 import logging
 from glob import glob
 import os
+from mnist import MNIST
 
 logging.basicConfig(level = logging.INFO)
 
@@ -18,6 +18,7 @@ test_labels = "t10k-labels-idx1-ubyte.gz"
 		
 def descargar_mnist(directorio):
 	logging.info("Descargando base de datos MNIST...")
+	
 	urllib.request.urlretrieve(MNIST_URL + training_images, directorio + training_images)
 	urllib.request.urlretrieve(MNIST_URL + training_labels, directorio + training_labels)
 	urllib.request.urlretrieve(MNIST_URL + test_images, directorio + test_images)
@@ -26,12 +27,20 @@ def descargar_mnist(directorio):
 	archivos = glob(directorio + '*.gz')
 	comando = 'gzip -dk ' + ' '.join(archivos)
 	os.system(comando)
-	
+
 	logging.info("Base de datos MNIST descargada en " + directorio)
 	
+def leer_mnist(directorio):
+	logging.info("Leyendo datos de MNIST...")
+	datos_mnist = MNIST(directorio)
+	training_images, training_labels = datos_mnist.load_training()
+	test_images, test_labels = datos_mnist.load_testing()
+
+	print(datos_mnist.display(training_images[0]))
+
 def main():
-	descargar_mnist("./data/")
-	# read_images("./data/")
+	# descargar_mnist("./data/")
+	leer_mnist("./data/")
 
 if __name__ == "__main__":
     main()
