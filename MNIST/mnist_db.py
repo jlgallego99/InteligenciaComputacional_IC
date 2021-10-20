@@ -6,19 +6,19 @@ logging.basicConfig(level = logging.INFO)
 MNIST_URL = "http://yann.lecun.com/exdb/mnist/"
 
 # Datos de entrenamiento
-trainingImages = "train-images-idx3-ubyte.gz"
-trainingLabels = "train-labels-idx1-ubyte.gz"
+training_images = "train-images-idx3-ubyte.gz"
+training_labels = "train-labels-idx1-ubyte.gz"
 
 # Datos de test
-testImages = "t10k-images-idx3-ubyte.gz"
-testLabels = "t10k-labels-idx1-ubyte.gz"
+test_images = "t10k-images-idx3-ubyte.gz"
+test_labels = "t10k-labels-idx1-ubyte.gz"
 		
 def descargar_mnist(directorio):
 	logging.info("Descargando base de datos MNIST...")
-	urllib.request.urlretrieve(MNIST_URL + trainingImages, directorio + trainingImages)
-	urllib.request.urlretrieve(MNIST_URL + trainingLabels, directorio + trainingLabels)
-	urllib.request.urlretrieve(MNIST_URL + testImages, directorio + testImages)
-	urllib.request.urlretrieve(MNIST_URL + testLabels, directorio + testLabels)
+	urllib.request.urlretrieve(MNIST_URL + training_images, directorio + training_images)
+	urllib.request.urlretrieve(MNIST_URL + training_labels, directorio + training_labels)
+	urllib.request.urlretrieve(MNIST_URL + test_images, directorio + test_images)
+	urllib.request.urlretrieve(MNIST_URL + test_labels, directorio + test_labels)
 	logging.info("Base de datos MNIST descargada en " + directorio)
 
 def read_images():
