@@ -46,11 +46,8 @@ def leer_mnist(directorio):
 	test_images, test_labels = datos_mnist.load_testing()
 
 	# Convertir datos a arrays de numpy
-	for i in range(len(training_images)):
-		training_images[i] = np.reshape(training_images[i], (28, 28))
-
-	for i in range(len(test_images)):
-		test_images[i] = np.reshape(test_images[i], (28, 28))
+	training_images = np.array(training_images)
+	test_images = np.array(test_images)
 
 	# Normalizar datos
 	training_images = training_images.reshape((60000, 28 * 28))
