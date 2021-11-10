@@ -41,11 +41,4 @@ def leer_mnist(directorio):
 
 	logging.info("Datos de MNIST listos para usarse")
 
-	# print(datos_mnist.display(training_images[0]))
-
-def main():
-	# descargar_mnist("./data/")
-	leer_mnist("./data/")
-
-if __name__ == "__main__":
-    main()
+	return (training_images, training_labels, test_images, test_labels)
