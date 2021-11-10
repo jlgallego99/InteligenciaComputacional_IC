@@ -3,6 +3,7 @@ import logging
 from glob import glob
 import os
 from mnist import MNIST
+import numpy as np
 
 logging.basicConfig(level = logging.INFO)
 
@@ -24,8 +25,13 @@ def descargar_mnist(directorio):
 	urllib.request.urlretrieve(MNIST_URL + test_images, directorio + test_images)
 	urllib.request.urlretrieve(MNIST_URL + test_labels, directorio + test_labels)
 	
+	# Descomprimir datos
 	archivos = glob(directorio + '*.gz')
 	comando = 'gzip -dk ' + ' '.join(archivos)
+	os.system(comando)
+
+	# Eliminar comprimidos
+	comando = 'rm ' + ' '.join(archivos)
 	os.system(comando)
 
 	logging.info("Base de datos MNIST descargada en " + directorio)
@@ -39,13 +45,16 @@ def leer_mnist(directorio):
 	training_images, training_labels = datos_mnist.load_training()
 	test_images, test_labels = datos_mnist.load_testing()
 
+	# Convertir datos a arrays de numpy
+	training_images = np.array(training_images)
+	test_images = np.array(test_images)
+
+	# Normalizar datos
+	training_images = training_images.reshape((60000, 28 * 28))
+	training_images = training_images.astype('float32') / 255
+	test_images = test_images.reshape((10000, 28 * 28))
+	test_images = test_images.astype('float32') / 255
+
 	logging.info("Datos de MNIST listos para usarse")
 
-	# print(datos_mnist.display(training_images[0]))
-
-def main():
-	# descargar_mnist("./data/")
-	leer_mnist("./data/")
-
-if __name__ == "__main__":
-    main()
+	return (training_images, training_labels, test_images, test_labels)
