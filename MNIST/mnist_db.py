@@ -24,8 +24,13 @@ def descargar_mnist(directorio):
 	urllib.request.urlretrieve(MNIST_URL + test_images, directorio + test_images)
 	urllib.request.urlretrieve(MNIST_URL + test_labels, directorio + test_labels)
 	
+	# Descomprimir datos
 	archivos = glob(directorio + '*.gz')
 	comando = 'gzip -dk ' + ' '.join(archivos)
+	os.system(comando)
+
+	# Eliminar comprimidos
+	comando = 'rm ' + ' '.join(archivos)
 	os.system(comando)
 
 	logging.info("Base de datos MNIST descargada en " + directorio)
