@@ -52,6 +52,12 @@ def leer_mnist(directorio):
 	for i in range(len(test_images)):
 		test_images[i] = np.reshape(test_images[i], (28, 28))
 
+	# Normalizar datos
+	training_images = training_images.reshape((60000, 28 * 28))
+	training_images = training_images.astype('float32') / 255
+	test_images = test_images.reshape((10000, 28 * 28))
+	test_images = test_images.astype('float32') / 255
+
 	logging.info("Datos de MNIST listos para usarse")
 
 	return (training_images, training_labels, test_images, test_labels)
