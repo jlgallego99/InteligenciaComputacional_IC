@@ -3,6 +3,7 @@ import logging
 from glob import glob
 import os
 from mnist import MNIST
+import numpy as np
 
 logging.basicConfig(level = logging.INFO)
 
@@ -43,6 +44,13 @@ def leer_mnist(directorio):
 	# Cada label es un array de bytes sin signo
 	training_images, training_labels = datos_mnist.load_training()
 	test_images, test_labels = datos_mnist.load_testing()
+
+	# Convertir datos a arrays de numpy
+	for i in range(len(training_images)):
+		training_images[i] = np.reshape(training_images[i], (28, 28))
+
+	for i in range(len(test_images)):
+		test_images[i] = np.reshape(test_images[i], (28, 28))
 
 	logging.info("Datos de MNIST listos para usarse")
 
