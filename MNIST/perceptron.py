@@ -57,7 +57,7 @@ print("Precisión sobre el conjunto de prueba: ", test_acc * 100.0, "%")
 print("Error sobre el conjunto de prueba: ", 100.0 - (test_acc * 100.0), "%")
 
 # Guardar etiquetas asignadas a los casos del conjunto de prueba en un fichero txt
-sourceFile = open('labels.txt', 'w')
+sourceFile = open('labels-' + sys.argv[1] + '.txt', 'w')
 for label in labels_prueba:
     print(np.argmax(label), end='', file=sourceFile)
 
