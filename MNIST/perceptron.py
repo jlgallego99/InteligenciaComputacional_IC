@@ -35,8 +35,10 @@ test_labels = to_categorical(test_labels)
 network = models.Sequential()
 
 if sys.argv[1] == "single":
+    network.add(layers.Input(shape=(28 * 28, )))
     network.add(layers.Dense(10, activation='softmax'))
 elif sys.argv[1] == "multi":
+    network.add(layers.Input(shape=(28 * 28,)))
     network.add(layers.Dense(512, activation='relu', input_shape=(28 * 28,), kernel_initializer='random_uniform'))
     network.add(layers.Dense(10, activation='softmax'))
 else:
@@ -57,8 +59,8 @@ print("Precisión sobre el conjunto de prueba: ", test_acc * 100.0, "%")
 print("Error sobre el conjunto de prueba: ", 100.0 - (test_acc * 100.0), "%")
 
 # Guardar etiquetas asignadas a los casos del conjunto de prueba en un fichero txt
-sourceFile = open('labels-' + sys.argv[1] + '.txt', 'w')
+f = open('labels-' + sys.argv[1] + '.txt', 'w')
 for label in labels_prueba:
-    print(np.argmax(label), end='', file=sourceFile)
+    print(np.argmax(label), end='', file=f)
 
-sourceFile.close()
+f.close()
