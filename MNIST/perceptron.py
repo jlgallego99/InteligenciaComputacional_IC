@@ -1,6 +1,7 @@
 import os
 import sys
 import logging
+import time
 from tensorflow.keras import models
 from tensorflow.keras import layers
 from tensorflow.keras.utils import to_categorical
@@ -48,8 +49,11 @@ else:
 # Preparar red especificando: función de error, optimizador y las métricas para evaluar su funcionamiento
 network.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
 
-# Entrenar la red
+# Entrenar la red midiendo el tiempo que se tarda
+train_start = time.time()
 network.fit(training_images, training_labels, epochs=10, batch_size=128)
+train_end = time.time()
+print("Tiempo empleado en el entrenamiento: ", train_end - train_start)
 
 # Evaluar la red sobre el conjunto de prueba
 print("Evaluando red neuronal...")
