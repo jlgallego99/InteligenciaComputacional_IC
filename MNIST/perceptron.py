@@ -39,7 +39,7 @@ if sys.argv[1] == "single":
     network.add(layers.Dense(10, activation='softmax'))
 elif sys.argv[1] == "multi":
     network.add(layers.Input(shape=(28 * 28,)))
-    network.add(layers.Dense(512, activation='relu', input_shape=(28 * 28,), kernel_initializer='random_uniform'))
+    network.add(layers.Dense(512, activation='relu', kernel_initializer='random_uniform'))
     network.add(layers.Dense(10, activation='softmax'))
 else:
     print("Error, parámetro incorrecto")
@@ -53,9 +53,10 @@ network.fit(training_images, training_labels, epochs=10, batch_size=128)
 
 # Evaluar la red sobre el conjunto de prueba
 print("Evaluando red neuronal...")
+_, train_acc = network.evaluate(training_images, training_labels)
 _, test_acc = network.evaluate(test_images, test_labels)
 labels_prueba = network.predict(test_images)
-print("Precisión sobre el conjunto de prueba: ", test_acc * 100.0, "%")
+print("Error sobre el conjunto de entrenamiento: ", 100.0 - (train_acc * 100.0), "%")
 print("Error sobre el conjunto de prueba: ", 100.0 - (test_acc * 100.0), "%")
 
 # Guardar etiquetas asignadas a los casos del conjunto de prueba en un fichero txt
