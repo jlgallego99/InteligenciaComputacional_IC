@@ -1,5 +1,6 @@
 import os
 import logging
+import time
 from tensorflow.keras import models
 from tensorflow.keras import layers
 from tensorflow.keras.utils import to_categorical
@@ -32,20 +33,24 @@ network.add(layers.MaxPooling2D((2, 2)))
 network.add(layers.Conv2D(64, kernel_size=(3, 3), activation='relu'))
 network.add(layers.MaxPooling2D((2, 2)))
 network.add(layers.Flatten())
-network.add(layers.Dropout(0.5))
+network.add(layers.Dense(512, activation='relu', kernel_initializer='random_uniform'))
 network.add(layers.Dense(10, activation='softmax'))
 
 # Preparar red especificando: función de error, optimizador y las métricas para evaluar su funcionamiento
 network.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
 
-# Entrenar la red
+# Entrenar la red midiendo el tiempo que se tarda
+train_start = time.time()
 network.fit(training_images, training_labels, epochs=10, batch_size=128)
+train_end = time.time()
+print("Tiempo empleado en el entrenamiento: ", train_end - train_start)
 
-# Evaluar la red sobre el conjunto de prueba
+# Evaluar la red sobre el conjunto de prueba y entrenamiento
 print("Evaluando red neuronal...")
+_, train_acc = network.evaluate(training_images, training_labels)
 _, test_acc = network.evaluate(test_images, test_labels)
 labels_prueba = network.predict(test_images)
-print("Precisión sobre el conjunto de prueba: ", test_acc * 100.0, "%")
+print("Error sobre el conjunto de entrenamiento: ", 100.0 - (train_acc * 100.0), "%")
 print("Error sobre el conjunto de prueba: ", 100.0 - (test_acc * 100.0), "%")
 
 # Guardar etiquetas asignadas a los casos del conjunto de prueba en un fichero txt

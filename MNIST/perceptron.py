@@ -55,7 +55,7 @@ network.fit(training_images, training_labels, epochs=10, batch_size=128)
 train_end = time.time()
 print("Tiempo empleado en el entrenamiento: ", train_end - train_start)
 
-# Evaluar la red sobre el conjunto de prueba
+# Evaluar la red sobre el conjunto de prueba y entrenamiento
 print("Evaluando red neuronal...")
 _, train_acc = network.evaluate(training_images, training_labels)
 _, test_acc = network.evaluate(test_images, test_labels)
