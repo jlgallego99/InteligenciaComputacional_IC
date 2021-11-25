@@ -50,9 +50,9 @@ def leer_mnist(directorio):
 	test_images = np.array(test_images)
 
 	# Normalizar datos
-	training_images = training_images.reshape((60000, 28 * 28))
+	training_images = training_images.reshape(60000, 28, 28, 1)
 	training_images = training_images.astype('float32') / 255
-	test_images = test_images.reshape((10000, 28 * 28))
+	test_images = test_images.reshape(10000, 28, 28, 1)
 	test_images = test_images.astype('float32') / 255
 
 	logging.info("Datos de MNIST listos para usarse")
