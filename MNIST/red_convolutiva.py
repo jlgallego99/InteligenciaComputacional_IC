@@ -40,9 +40,8 @@ network.add(layers.MaxPooling2D((2, 2)))
 network.add(layers.Flatten())
 # Capas de clasificación
 network.add(layers.Dropout(0.5))
-network.add(layers.Dense(256, activation="relu"))
-network.add(layers.Dropout(0.5))
 network.add(layers.Dense(512, activation="relu"))
+network.add(layers.Dropout(0.5))
 network.add(layers.Dense(10, activation='softmax'))
 
 # Preparar red especificando: función de error, optimizador y las métricas para evaluar su funcionamiento
@@ -50,7 +49,7 @@ network.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc
 
 # Entrenar la red midiendo el tiempo que se tarda
 train_start = time.time()
-network.fit(training_images, training_labels, epochs=15, batch_size=128)
+network.fit(training_images, training_labels, epochs=20, batch_size=128)
 train_end = time.time()
 print("Tiempo empleado en el entrenamiento: ", train_end - train_start)
 
