@@ -26,21 +26,22 @@ else:
     logging.info("Los datos ya están descargados")
 
 (training_images, training_labels, test_images, test_labels) = mnist.leer_mnist("./data/")
+# Ajustar dimensiones para las capas normales
+training_images = training_images.reshape(60000, 28 * 28, )
+test_images = test_images.reshape(10000, 28 * 28, )
 
 # Codificar las etiquetas
 training_labels = to_categorical(training_labels)
 test_labels = to_categorical(test_labels)
 
 # Definir la topología de la red neuronal
-# Una capa oculta de unidades lineales rectificadas y una capa de salida softmax
 network = models.Sequential()
 
 if sys.argv[1] == "single":
-    network.add(layers.Input(shape=(28 * 28, )))
-    network.add(layers.Dense(10, activation='softmax'))
+    network.add(layers.Dense(10, activation='softmax', input_shape=(28 * 28, )))
 elif sys.argv[1] == "multi":
-    network.add(layers.Input(shape=(28 * 28,)))
-    network.add(layers.Dense(512, activation='relu', kernel_initializer='random_uniform'))
+    network.add(layers.Dense(256, activation='relu', input_shape=(28 * 28,)))
+    network.add(layers.Dense(512, activation='relu'))
     network.add(layers.Dense(10, activation='softmax'))
 else:
     print("Error, parámetro incorrecto")
