@@ -8,32 +8,37 @@ const (
 	Lamarckian
 )
 
+const bestKnownSolution int = 44759294
+
 type evolutionaryAlgorithm struct {
+	t int
 }
 
 func NewEvolutionaryAlgorithm(n int, A, B [][]int) *evolutionaryAlgorithm {
-	return &evolutionaryAlgorithm{}
+	return &evolutionaryAlgorithm{0}
 }
 
-func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
+func (ev *evolutionaryAlgorithm) Run(alg algorithmType) *Population {
 	switch alg {
 	case Generic:
-		genericAlgorithm()
+		return genericAlgorithm()
 	case Baldwinian:
-		baldwinianAlgorithm()
+		return baldwinianAlgorithm()
 	case Lamarckian:
-		lamarckianAlgorithm()
+		return lamarckianAlgorithm()
 	}
+
+	return nil
 }
 
-func genericAlgorithm() {
-
+func genericAlgorithm() *Population {
+	return nil
 }
 
-func baldwinianAlgorithm() {
-
+func baldwinianAlgorithm() *Population {
+	return nil
 }
 
-func lamarckianAlgorithm() {
-
+func lamarckianAlgorithm() *Population {
+	return nil
 }
