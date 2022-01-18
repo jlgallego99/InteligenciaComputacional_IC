@@ -21,6 +21,9 @@ else:
     logging.info("Los datos ya están descargados")
 
 (training_images, training_labels, test_images, test_labels) = mnist.leer_mnist("./data/")
+# Ajustar dimensiones que acepte las capas convolutivas
+training_images = training_images.reshape(60000, 28, 28, 1)
+test_images = test_images.reshape(10000, 28, 28, 1)
 
 # Codificar las etiquetas
 training_labels = to_categorical(training_labels)
@@ -28,20 +31,25 @@ test_labels = to_categorical(test_labels)
 
 # Definir la topología de la red neuronal
 network = models.Sequential()
+# Capas convolucionales
 network.add(layers.Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(28, 28, 1)))
 network.add(layers.MaxPooling2D((2, 2)))
 network.add(layers.Conv2D(64, kernel_size=(3, 3), activation='relu'))
 network.add(layers.MaxPooling2D((2, 2)))
+# Aplanar para poder conectar con el resto de neuronas
 network.add(layers.Flatten())
-network.add(layers.Dense(512, activation='relu', kernel_initializer='random_uniform'))
+# Capas de clasificación
+network.add(layers.Dropout(0.5))
+network.add(layers.Dense(512, activation="relu"))
+network.add(layers.Dropout(0.5))
 network.add(layers.Dense(10, activation='softmax'))
 
 # Preparar red especificando: función de error, optimizador y las métricas para evaluar su funcionamiento
-network.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
+network.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
 # Entrenar la red midiendo el tiempo que se tarda
 train_start = time.time()
-network.fit(training_images, training_labels, epochs=10, batch_size=128)
+network.fit(training_images, training_labels, epochs=20, batch_size=128)
 train_end = time.time()
 print("Tiempo empleado en el entrenamiento: ", train_end - train_start)
 
