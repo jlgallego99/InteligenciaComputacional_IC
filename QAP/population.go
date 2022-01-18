@@ -39,3 +39,7 @@ func (p *Population) Fitness(ind int) float64 {
 func (p *Population) BestFitness() []int {
 	return nil
 }
+
+func (p *Population) BestSolution() []int {
+	return nil
+}
