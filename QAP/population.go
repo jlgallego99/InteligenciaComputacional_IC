@@ -20,15 +20,11 @@ func (p *Population) Elitism() {
 
 }
 
-func (p *Population) OnePointCrossover() {
+func (p *Population) OrderCrossover() {
 
 }
 
-func (p *Population) UniformCrossover() {
-
-}
-
-func (p *Population) Mutate() {
+func (p *Population) ExchangeMutation() {
 
 }
 
