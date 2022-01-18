@@ -14,6 +14,9 @@ func main() {
 		return
 	}
 
-	fmt.Println(n)
-	fmt.Println(A, "\n", B)
+	// Run evolutionary algorithm
+	ev := NewEvolutionaryAlgorithm(n, A, B)
+	ev.Run(Generic)
+	ev.Run(Baldwinian)
+	ev.Run(Lamarckian)
 }
