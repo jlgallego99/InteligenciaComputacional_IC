@@ -34,7 +34,7 @@ func main() {
 	fmt.Println("Fitness: ", popBaldwinian.BestFitness())
 	fmt.Println("Solution: ", popBaldwinian.BestSolution())
 
-	// Generic algorithm solution
+	// Lamarckian algorithm solution
 	start = time.Now()
 	popLamarckian := ev.Run(Lamarckian)
 	end = time.Since(start)
