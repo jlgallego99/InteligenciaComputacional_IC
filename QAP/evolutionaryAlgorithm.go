@@ -1,5 +1,9 @@
 package main
 
+import (
+	"errors"
+)
+
 type algorithmType int
 
 const (
@@ -11,14 +15,29 @@ const (
 const bestKnownSolution int = 44759294
 
 type evolutionaryAlgorithm struct {
-	t int
+	Population *Population
+	t          int
+	n          int
+	A          [][]int
+	B          [][]int
 }
 
-func NewEvolutionaryAlgorithm(n int, A, B [][]int) *evolutionaryAlgorithm {
-	return &evolutionaryAlgorithm{0}
+func NewEvolutionaryAlgorithm(data string) (*evolutionaryAlgorithm, error) {
+	// Read QAP problem
+	n, A, B, err := ReadData(data)
+	if err != nil {
+		return nil, errors.New("error reading data (" + data + "): " + err.Error())
+	}
+
+	// Create population
+	pop := NewPopulation()
+
+	return &evolutionaryAlgorithm{pop, 0, n, A, B}, nil
 }
 
 func (ev *evolutionaryAlgorithm) Run(alg algorithmType) *Population {
+	ev.t = 0
+
 	switch alg {
 	case Generic:
 		return genericAlgorithm()
