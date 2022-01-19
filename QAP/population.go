@@ -56,8 +56,8 @@ func (in *Individual) Fitness(n int, A, B [][]int) int {
 	return fitness
 }
 
-func (p *Population) BestFitness() []int {
-	return nil
+func (p *Population) BestFitness() int {
+	return p.BestFit
 }
 
 func (p *Population) BestSolution() []int {

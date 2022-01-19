@@ -5,6 +5,18 @@ import (
 	"time"
 )
 
+const bestKnownFitness int = 44759294
+
+func fitnessDifference(c int) float32 {
+	difference := float32(5.0 - 100.0*(c-bestKnownFitness)/bestKnownFitness)
+
+	if difference < 0 {
+		difference = 0.0
+	}
+
+	return difference
+}
+
 func main() {
 	data := "chr12a.dat"
 
@@ -23,6 +35,7 @@ func main() {
 	fmt.Println("GENERIC ALGORITHM")
 	fmt.Println("Time (seconds): ", end.Seconds())
 	fmt.Println("Fitness: ", popGeneric.BestFitness())
+	fmt.Println("Fitness difference from best known: ", fitnessDifference(popGeneric.BestFitness()))
 	fmt.Println("Solution: ", popGeneric.BestSolution())
 
 	// Baldwinian algorithm solution
@@ -32,6 +45,7 @@ func main() {
 	fmt.Println("GENERIC ALGORITHM")
 	fmt.Println("Time (seconds): ", end.Seconds())
 	fmt.Println("Fitness: ", popBaldwinian.BestFitness())
+	fmt.Println("Fitness difference from best known: ", fitnessDifference(popBaldwinian.BestFitness()))
 	fmt.Println("Solution: ", popBaldwinian.BestSolution())
 
 	// Lamarckian algorithm solution
@@ -41,5 +55,6 @@ func main() {
 	fmt.Println("GENERIC ALGORITHM")
 	fmt.Println("Time (seconds): ", end.Seconds())
 	fmt.Println("Fitness: ", popLamarckian.BestFitness())
+	fmt.Println("Fitness difference from best known: ", fitnessDifference(popLamarckian.BestFitness()))
 	fmt.Println("Solution: ", popLamarckian.BestSolution())
 }

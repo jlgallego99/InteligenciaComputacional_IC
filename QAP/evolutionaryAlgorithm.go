@@ -12,8 +12,6 @@ const (
 	Lamarckian
 )
 
-const bestKnownSolution int = 44759294
-
 type evolutionaryAlgorithm struct {
 	Population *Population
 	t          int
