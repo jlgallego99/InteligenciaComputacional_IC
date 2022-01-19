@@ -2,6 +2,8 @@ package main
 
 import (
 	"errors"
+	"fmt"
+	"math"
 	"math/rand"
 	"time"
 )
@@ -58,6 +60,10 @@ func NewPopulation(individuals, generations, solSize int) *Population {
 func NewIndividual(solSize int) *Individual {
 	sols := make([]int, solSize)
 
+	for i := range sols {
+		sols[i] = -1
+	}
+
 	return &Individual{sols}
 }
 
@@ -111,8 +117,52 @@ func (ev *evolutionaryAlgorithm) Elitism() {
 
 }
 
-func (ev *evolutionaryAlgorithm) OrderCrossover() {
+func (ev *evolutionaryAlgorithm) OrderCrossover(crossPoint1, crossPoint2 int) {
+	probCross := 0.8
+	numIndividuals := int(math.Ceil(float64(ev.PopulationSize()) * probCross))
+	p_cross := make([]*Individual, 0)
 
+	//rand.Seed(time.Now().UnixNano())
+	//rand.Intn(ev.n)
+	//rand.Intn(ev.n-crossPoint1) + crossPoint1
+
+	for i := 0; i < numIndividuals-1; i++ {
+		son1 := NewIndividual(ev.n)
+		son2 := NewIndividual(ev.n)
+		father1 := ev.Population.Individuals[i+i]
+		father2 := ev.Population.Individuals[i+i+1]
+
+		fmt.Println("hola")
+
+		copy(son1.Solution[crossPoint1:crossPoint2+1%ev.n], father1.Solution[crossPoint1:crossPoint2+1%ev.n])
+		copy(son2.Solution[crossPoint1:crossPoint2+1%ev.n], father2.Solution[crossPoint1:crossPoint2+1%ev.n])
+
+		index := (crossPoint2 + 1) % ev.n
+		for j := 0; j < ev.n || index < crossPoint1; j++ {
+			fi := (crossPoint2 + 1 + j) % ev.n
+
+			if !contains(son1.Solution, father2.Solution[fi]) {
+				son1.Solution[index] = father2.Solution[fi]
+				index = (index + 1) % ev.n
+			}
+		}
+
+		index = (crossPoint2 + 1) % ev.n
+		for j := 0; j < ev.n || index < crossPoint1; j++ {
+			fi := (crossPoint2 + 1 + j) % ev.n
+
+			fmt.Println(son2.Solution, father1.Solution[fi])
+
+			if !contains(son2.Solution, father1.Solution[fi]) {
+				son2.Solution[index] = father1.Solution[fi]
+				index = (index + 1) % ev.n
+			}
+		}
+
+		p_cross = append(p_cross, son1, son2)
+	}
+
+	ev.Population.Individuals = p_cross
 }
 
 func (ev *evolutionaryAlgorithm) ExchangeMutation() {
@@ -142,4 +192,14 @@ func (ev *evolutionaryAlgorithm) BestFitness() int {
 
 func (ev *evolutionaryAlgorithm) BestSolution() []int {
 	return nil
+}
+
+func contains(s []int, e int) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+
+	return false
 }
