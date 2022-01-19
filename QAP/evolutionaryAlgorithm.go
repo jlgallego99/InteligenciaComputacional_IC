@@ -202,7 +202,7 @@ func (ev *evolutionaryAlgorithm) ExchangeMutation(point1, point2 int) {
 
 func (ev *evolutionaryAlgorithm) Elitism() {
 	eliteExists := false
-	worstFitness := int(^uint(0) >> 1)
+	worstFitness := -int(^uint(0) >> 1)
 	i_worst := 0
 
 	for i, v := range ev.Population.Individuals {
@@ -245,12 +245,18 @@ func (ev *evolutionaryAlgorithm) Fitness(ind int) int {
 	return fitness
 }
 
-func (ev *evolutionaryAlgorithm) BestSolution() []int {
-	return nil
-}
+func (ev *evolutionaryAlgorithm) BestSolution() ([]int, int) {
+	solution := make([]int, ev.n)
+	fitness := int(^uint(0) >> 1)
 
-func (ev *evolutionaryAlgorithm) BestFitness() int {
-	return 0
+	for i := range ev.Population.Individuals {
+		if ev.Fitness(i) < fitness {
+			fitness = ev.Fitness(i)
+			solution = ev.Population.Individuals[i].Solution
+		}
+	}
+
+	return solution, fitness
 }
 
 func contains(s []int, e int) bool {
