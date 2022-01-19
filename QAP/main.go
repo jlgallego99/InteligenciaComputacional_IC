@@ -33,37 +33,37 @@ func main() {
 	}
 
 	fmt.Println("Running evolutionary algorithms...")
-	fmt.Println("Population size:", ev.Population.Size())
+	fmt.Println("Population size:", ev.PopulationSize())
 	fmt.Println("Generations:", ev.Population.Generations)
 	fmt.Println("")
 
 	// Generic algorithm solution
 	start := time.Now()
-	popGeneric := ev.Run(Generic)
+	ev.Run(Generic)
 	end := time.Since(start)
 	fmt.Println("GENERIC ALGORITHM")
 	fmt.Println("Time (seconds):", end.Seconds())
-	fmt.Println("Fitness:", popGeneric.BestFitness())
-	fmt.Println("Fitness difference from best known:", fitnessDifference(popGeneric.BestFitness()))
-	fmt.Println("Solution:", popGeneric.BestSolution())
+	fmt.Println("Fitness:", ev.BestFitness())
+	fmt.Println("Fitness difference from best known:", fitnessDifference(ev.BestFitness()))
+	fmt.Println("Solution:", ev.BestSolution())
 
 	// Baldwinian algorithm solution
-	start = time.Now()
-	popBaldwinian := ev.Run(Baldwinian)
+	/*start = time.Now()
+	ev.Run(Baldwinian)
 	end = time.Since(start)
 	fmt.Println("GENERIC ALGORITHM")
 	fmt.Println("Time (seconds):", end.Seconds())
-	fmt.Println("Fitness:", popBaldwinian.BestFitness())
-	fmt.Println("Fitness difference from best known:", fitnessDifference(popBaldwinian.BestFitness()))
-	fmt.Println("Solution:", popBaldwinian.BestSolution())
+	fmt.Println("Fitness:", ev.BestFitness())
+	fmt.Println("Fitness difference from best known:", fitnessDifference(ev.BestFitness()))
+	fmt.Println("Solution:", ev.BestSolution())
 
 	// Lamarckian algorithm solution
 	start = time.Now()
-	popLamarckian := ev.Run(Lamarckian)
+	ev.Run(Lamarckian)
 	end = time.Since(start)
 	fmt.Println("GENERIC ALGORITHM")
 	fmt.Println("Time (seconds):", end.Seconds())
-	fmt.Println("Fitness:", popLamarckian.BestFitness())
-	fmt.Println("Fitness difference from best known:", fitnessDifference(popLamarckian.BestFitness()))
-	fmt.Println("Solution:", popLamarckian.BestSolution())
+	fmt.Println("Fitness:", ev.BestFitness())
+	fmt.Println("Fitness difference from best known:", fitnessDifference(ev.BestFitness()))
+	fmt.Println("Solution:", ev.BestSolution())*/
 }
