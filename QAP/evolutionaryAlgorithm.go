@@ -20,7 +20,7 @@ type evolutionaryAlgorithm struct {
 	B          [][]int
 }
 
-func NewEvolutionaryAlgorithm(data string) (*evolutionaryAlgorithm, error) {
+func NewEvolutionaryAlgorithm(data string, individuals, generations int) (*evolutionaryAlgorithm, error) {
 	// Read QAP problem
 	n, A, B, err := ReadData(data)
 	if err != nil {
@@ -28,7 +28,7 @@ func NewEvolutionaryAlgorithm(data string) (*evolutionaryAlgorithm, error) {
 	}
 
 	// Create population
-	pop := NewPopulation()
+	pop := NewPopulation(individuals, generations, n)
 
 	return &evolutionaryAlgorithm{pop, 0, n, A, B}, nil
 }

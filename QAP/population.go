@@ -1,7 +1,7 @@
 package main
 
 type Population struct {
-	Individuals []Individual
+	Individuals []*Individual
 	Generations int
 	BestFit     int
 }
@@ -10,8 +10,20 @@ type Individual struct {
 	Solution []int
 }
 
-func NewPopulation() *Population {
-	return &Population{}
+func NewPopulation(individuals, generations, solSize int) *Population {
+	p := &Population{make([]*Individual, 0), generations, 0}
+
+	for i := 0; i < individuals; i++ {
+		p.Individuals = append(p.Individuals, NewIndividual(solSize))
+	}
+
+	return p
+}
+
+func NewIndividual(solSize int) *Individual {
+	sols := make([]int, solSize)
+
+	return &Individual{sols}
 }
 
 func (p *Population) Size() int {
