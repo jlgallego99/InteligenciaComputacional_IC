@@ -26,11 +26,14 @@ type evolutionaryAlgorithm struct {
 type Population struct {
 	Individuals []*Individual
 	Generations int
+	Evaluations int
 	BestFit     int
 }
 
 type Individual struct {
-	Solution []int
+	Solution    []int
+	Fitness     int
+	NeedFitness bool
 }
 
 func NewEvolutionaryAlgorithm(data string, individuals, generations int) (*evolutionaryAlgorithm, error) {
@@ -48,7 +51,7 @@ func NewEvolutionaryAlgorithm(data string, individuals, generations int) (*evolu
 
 func NewPopulation(individuals, generations, solSize int) *Population {
 	rand.Seed(time.Now().UnixNano())
-	p := &Population{make([]*Individual, 0), generations, 0}
+	p := &Population{make([]*Individual, 0), generations, 0, 0}
 
 	for i := 0; i < individuals; i++ {
 		var ind *Individual = NewIndividual(solSize)
@@ -83,7 +86,7 @@ func NewIndividual(solSize int) *Individual {
 		sols[i] = -1
 	}
 
-	return &Individual{sols}
+	return &Individual{sols, 0, false}
 }
 
 func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
@@ -131,11 +134,6 @@ func (ev *evolutionaryAlgorithm) SelectTournament() {
 	ev.Population.Individuals = p_selection
 }
 
-// Survivors selection
-func (ev *evolutionaryAlgorithm) Elitism() {
-
-}
-
 func (ev *evolutionaryAlgorithm) OrderCrossover(crossPoint1, crossPoint2 int) {
 	probCross := 0.8
 	numIndividuals := int(math.Ceil(float64(ev.PopulationSize()) * probCross))
@@ -173,6 +171,9 @@ func (ev *evolutionaryAlgorithm) OrderCrossover(crossPoint1, crossPoint2 int) {
 			}
 		}
 
+		son1.NeedFitness = true
+		son2.NeedFitness = true
+
 		p_cross = append(p_cross, son1, son2)
 	}
 
@@ -185,18 +186,29 @@ func (ev *evolutionaryAlgorithm) ExchangeMutation(point1, point2 int) {
 	}
 }
 
+func (ev *evolutionaryAlgorithm) Elitism() {
+
+}
+
 func (ev *evolutionaryAlgorithm) Evaluate() {
 
 }
 
 func (ev *evolutionaryAlgorithm) Fitness(ind int) int {
-	fitness := 0
-	in := ev.Population.Individuals[ind]
+	fitness := ev.Population.Individuals[ind].Fitness
 
-	for i := 0; i < ev.n; i++ {
-		for j := 0; j < ev.n; j++ {
-			fitness += ev.A[i][j] * ev.B[in.Solution[i]][in.Solution[j]]
+	if ev.Population.Individuals[ind].NeedFitness {
+		fitness = 0
+		in := ev.Population.Individuals[ind]
+
+		for i := 0; i < ev.n; i++ {
+			for j := 0; j < ev.n; j++ {
+				fitness += ev.A[i][j] * ev.B[in.Solution[i]][in.Solution[j]]
+			}
 		}
+
+		ev.Population.Evaluations++
+		ev.Population.Individuals[ind].NeedFitness = false
 	}
 
 	return fitness

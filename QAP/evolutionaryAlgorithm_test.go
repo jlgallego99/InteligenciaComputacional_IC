@@ -11,7 +11,7 @@ var son1 []int = []int{0, 5, 4, 2, 6, 3, 1}
 var son2 []int = []int{4, 6, 2, 0, 5, 3, 1}
 var mut1 []int = []int{0, 5, 6, 2, 4, 3, 1}
 var mut2 []int = []int{4, 6, 5, 0, 2, 3, 1}
-var population *Population = &Population{[]*Individual{{father1}, {father2}}, 5, 0}
+var population *Population = &Population{[]*Individual{{father1, 0, false}, {father2, 0, false}}, 5, 0, 0}
 var ev = &evolutionaryAlgorithm{population, 0, 7, nil, nil}
 
 func TestNewPopulation(t *testing.T) {
