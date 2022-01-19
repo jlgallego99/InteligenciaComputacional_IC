@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"math"
 	"math/rand"
 	"time"
@@ -131,9 +130,6 @@ func (ev *evolutionaryAlgorithm) OrderCrossover(crossPoint1, crossPoint2 int) {
 		son2 := NewIndividual(ev.n)
 		father1 := ev.Population.Individuals[i+i]
 		father2 := ev.Population.Individuals[i+i+1]
-
-		fmt.Println("hola")
-
 		copy(son1.Solution[crossPoint1:crossPoint2+1%ev.n], father1.Solution[crossPoint1:crossPoint2+1%ev.n])
 		copy(son2.Solution[crossPoint1:crossPoint2+1%ev.n], father2.Solution[crossPoint1:crossPoint2+1%ev.n])
 
@@ -151,8 +147,6 @@ func (ev *evolutionaryAlgorithm) OrderCrossover(crossPoint1, crossPoint2 int) {
 		for j := 0; j < ev.n || index < crossPoint1; j++ {
 			fi := (crossPoint2 + 1 + j) % ev.n
 
-			fmt.Println(son2.Solution, father1.Solution[fi])
-
 			if !contains(son2.Solution, father1.Solution[fi]) {
 				son2.Solution[index] = father1.Solution[fi]
 				index = (index + 1) % ev.n
@@ -165,8 +159,10 @@ func (ev *evolutionaryAlgorithm) OrderCrossover(crossPoint1, crossPoint2 int) {
 	ev.Population.Individuals = p_cross
 }
 
-func (ev *evolutionaryAlgorithm) ExchangeMutation() {
-
+func (ev *evolutionaryAlgorithm) ExchangeMutation(point1, point2 int) {
+	for _, ind := range ev.Population.Individuals {
+		ind.Solution[point1], ind.Solution[point2] = ind.Solution[point2], ind.Solution[point1]
+	}
 }
 
 func (ev *evolutionaryAlgorithm) Evaluate() {
