@@ -181,8 +181,13 @@ func (ev *evolutionaryAlgorithm) OrderCrossover(crossPoint1, crossPoint2 int) {
 }
 
 func (ev *evolutionaryAlgorithm) ExchangeMutation(point1, point2 int) {
+	rand.Seed(time.Now().UnixNano())
+
 	for _, ind := range ev.Population.Individuals {
-		ind.Solution[point1], ind.Solution[point2] = ind.Solution[point2], ind.Solution[point1]
+		// 5% chance of mutation
+		if rand.Float64() < 0.05 {
+			ind.Solution[point1], ind.Solution[point2] = ind.Solution[point2], ind.Solution[point1]
+		}
 	}
 }
 
