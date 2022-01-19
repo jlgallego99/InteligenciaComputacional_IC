@@ -47,10 +47,30 @@ func NewEvolutionaryAlgorithm(data string, individuals, generations int) (*evolu
 }
 
 func NewPopulation(individuals, generations, solSize int) *Population {
+	rand.Seed(time.Now().UnixNano())
 	p := &Population{make([]*Individual, 0), generations, 0}
 
 	for i := 0; i < individuals; i++ {
-		p.Individuals = append(p.Individuals, NewIndividual(solSize))
+		var ind *Individual = NewIndividual(solSize)
+		j := 0
+		for j != solSize {
+			val := rand.Intn(solSize)
+			exist := false
+
+			for _, v := range ind.Solution {
+				if v == val {
+					exist = true
+					break
+				}
+			}
+
+			if !exist {
+				ind.Solution[j] = val
+				j++
+			}
+		}
+
+		p.Individuals = append(p.Individuals, ind)
 	}
 
 	return p

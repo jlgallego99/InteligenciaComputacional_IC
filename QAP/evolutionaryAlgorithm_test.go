@@ -14,6 +14,20 @@ var mut2 []int = []int{4, 6, 5, 0, 2, 3, 1}
 var population *Population = &Population{[]*Individual{{father1}, {father2}}, 5, 0}
 var ev = &evolutionaryAlgorithm{population, 0, 7, nil, nil}
 
+func TestNewPopulation(t *testing.T) {
+	pop := NewPopulation(5, 5, 5)
+
+	if len(pop.Individuals) != 5 {
+		t.Errorf("Expected %v, got %v", 5, len(pop.Individuals))
+	}
+
+	for _, ind := range pop.Individuals {
+		if len(ind.Solution) != 5 {
+			t.Errorf("Expected %v, got %v", 5, len(ind.Solution))
+		}
+	}
+}
+
 func TestSelectTournament(t *testing.T) {
 
 }
