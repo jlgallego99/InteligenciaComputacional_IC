@@ -4,6 +4,7 @@ import (
 	"errors"
 	"math"
 	"math/rand"
+	"reflect"
 	"time"
 )
 
@@ -27,7 +28,7 @@ type Population struct {
 	Individuals []*Individual
 	Generations int
 	Evaluations int
-	BestFit     int
+	BestFather  *Individual
 }
 
 type Individual struct {
@@ -51,7 +52,7 @@ func NewEvolutionaryAlgorithm(data string, individuals, generations int) (*evolu
 
 func NewPopulation(individuals, generations, solSize int) *Population {
 	rand.Seed(time.Now().UnixNano())
-	p := &Population{make([]*Individual, 0), generations, 0, 0}
+	p := &Population{make([]*Individual, 0), generations, 0, nil}
 
 	for i := 0; i < individuals; i++ {
 		var ind *Individual = NewIndividual(solSize)
@@ -138,6 +139,7 @@ func (ev *evolutionaryAlgorithm) OrderCrossover(crossPoint1, crossPoint2 int) {
 	probCross := 0.8
 	numIndividuals := int(math.Ceil(float64(ev.PopulationSize()) * probCross))
 	p_cross := make([]*Individual, 0)
+	bestFather := ev.Population.Individuals[0]
 
 	//rand.Seed(time.Now().UnixNano())
 	//rand.Intn(ev.n)
@@ -171,9 +173,15 @@ func (ev *evolutionaryAlgorithm) OrderCrossover(crossPoint1, crossPoint2 int) {
 			}
 		}
 
+		// Elitism
+		if ev.Fitness(i+i) < bestFather.Fitness {
+			bestFather = father1
+		} else if ev.Fitness(i+i+1) < bestFather.Fitness {
+			bestFather = father2
+		}
+
 		son1.NeedFitness = true
 		son2.NeedFitness = true
-
 		p_cross = append(p_cross, son1, son2)
 	}
 
@@ -187,12 +195,30 @@ func (ev *evolutionaryAlgorithm) ExchangeMutation(point1, point2 int) {
 		// 5% chance of mutation
 		if rand.Float64() < 0.05 {
 			ind.Solution[point1], ind.Solution[point2] = ind.Solution[point2], ind.Solution[point1]
+			ind.NeedFitness = true
 		}
 	}
 }
 
 func (ev *evolutionaryAlgorithm) Elitism() {
+	eliteExists := false
+	worstFitness := int(^uint(0) >> 1)
+	i_worst := 0
 
+	for i, v := range ev.Population.Individuals {
+		if reflect.DeepEqual(ev.Population.BestFather.Solution, v.Solution) {
+			eliteExists = true
+			break
+		}
+
+		if ev.Fitness(i) > worstFitness {
+			i_worst = i
+		}
+	}
+
+	if !eliteExists {
+		ev.Population.Individuals[i_worst] = ev.Population.BestFather
+	}
 }
 
 func (ev *evolutionaryAlgorithm) Evaluate() {
@@ -219,12 +245,12 @@ func (ev *evolutionaryAlgorithm) Fitness(ind int) int {
 	return fitness
 }
 
-func (ev *evolutionaryAlgorithm) BestFitness() int {
-	return ev.Population.BestFit
-}
-
 func (ev *evolutionaryAlgorithm) BestSolution() []int {
 	return nil
+}
+
+func (ev *evolutionaryAlgorithm) BestFitness() int {
+	return 0
 }
 
 func contains(s []int, e int) bool {
