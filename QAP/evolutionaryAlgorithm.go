@@ -91,7 +91,9 @@ func NewIndividual(solSize int) *Individual {
 }
 
 func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
-	ev.Population.Generations = 0
+	// Optimized initial population
+	ev.Population = NewPopulation(ev.PopulationSize(), ev.Population.Generations, ev.n)
+	ev.twoOpt()
 
 	switch alg {
 	case Generic:
@@ -104,16 +106,18 @@ func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
 }
 
 func (ev *evolutionaryAlgorithm) genericAlgorithm() {
-	/*rand.Seed(time.Now().UnixNano())
-	crossPoint1 := rand.Intn(ev.n)
-	crossPoint2 := rand.Intn(ev.n-crossPoint1) + crossPoint1*/
+	rand.Seed(time.Now().UnixNano())
 
-	// Poblacion inicial con 2-opt
+	// Loop for generations
+	for t := 0; t < ev.Population.Generations; t++ {
+		ev.SelectTournament()
 
-	// Bucle
+		crossPoint1 := rand.Intn(ev.n)
+		crossPoint2 := rand.Intn(ev.n-crossPoint1) + crossPoint1
+		ev.OrderCrossover(crossPoint1, crossPoint2)
 
-	// Al final de cada bucle: otra vez 2-opt
-	ev.Population.Generations++
+		ev.twoOpt()
+	}
 }
 
 func (ev *evolutionaryAlgorithm) baldwinianAlgorithm() {
@@ -184,11 +188,12 @@ func (ev *evolutionaryAlgorithm) OrderCrossover(crossPoint1, crossPoint2 int) {
 	p_cross := make([]*Individual, 0)
 	bestFather := ev.Population.Individuals[0]
 
-	for i := 0; i < numIndividuals-1; i++ {
+	for i := 0; i < numIndividuals/2; i++ {
 		son1 := NewIndividual(ev.n)
 		son2 := NewIndividual(ev.n)
 		father1 := ev.Population.Individuals[i+i]
 		father2 := ev.Population.Individuals[i+i+1]
+
 		copy(son1.Solution[crossPoint1:crossPoint2+1%ev.n], father1.Solution[crossPoint1:crossPoint2+1%ev.n])
 		copy(son2.Solution[crossPoint1:crossPoint2+1%ev.n], father2.Solution[crossPoint1:crossPoint2+1%ev.n])
 

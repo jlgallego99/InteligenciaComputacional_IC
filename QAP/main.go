@@ -28,6 +28,7 @@ func main() {
 		fmt.Println("Default individuals: 100")
 		fmt.Println("Default generations: 100")
 		fmt.Println("Usage for the next time:", os.Args[0], "individuals generations")
+		fmt.Println("")
 
 		individuals = 100
 		generations = 100
