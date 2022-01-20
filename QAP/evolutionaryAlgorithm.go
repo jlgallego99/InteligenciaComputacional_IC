@@ -18,7 +18,6 @@ const (
 
 type evolutionaryAlgorithm struct {
 	Population *Population
-	t          int
 	n          int
 	A          [][]int
 	B          [][]int
@@ -47,7 +46,7 @@ func NewEvolutionaryAlgorithm(data string, individuals, generations int) (*evolu
 	// Create population
 	pop := NewPopulation(individuals, generations, n)
 
-	return &evolutionaryAlgorithm{pop, 0, n, A, B}, nil
+	return &evolutionaryAlgorithm{pop, n, A, B}, nil
 }
 
 func NewPopulation(individuals, generations, solSize int) *Population {
@@ -91,7 +90,7 @@ func NewIndividual(solSize int) *Individual {
 }
 
 func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
-	ev.t = 0
+	ev.Population.Generations = 0
 
 	switch alg {
 	case Generic:
@@ -107,6 +106,13 @@ func (ev *evolutionaryAlgorithm) genericAlgorithm() {
 	/*rand.Seed(time.Now().UnixNano())
 	crossPoint1 := rand.Intn(ev.n)
 	crossPoint2 := rand.Intn(ev.n-crossPoint1) + crossPoint1*/
+
+	// Poblacion inicial con 2-opt
+
+	// Bucle
+
+	// Al final de cada bucle: otra vez 2-opt
+	ev.Population.Generations++
 }
 
 func (ev *evolutionaryAlgorithm) baldwinianAlgorithm() {
@@ -119,6 +125,29 @@ func (ev *evolutionaryAlgorithm) PopulationSize() int {
 	return len(ev.Population.Individuals)
 }
 
+// Optimization for all individuals
+func (ev *evolutionaryAlgorithm) twoOpt() {
+	/*for _, S := range ev.Population.Individuals {
+		optimized := false
+
+		// Keep iterating n times or until the individual is improved
+		for it := 0; it < ev.n && !optimized; it++ {
+			best := S
+
+			for i := 0; i < ev.n-1; i++ {
+				for j := i + 1; j < ev.n; j++ {
+					T := NewIndividual(ev.n)
+					copy(T.Solution, S.Solution)
+
+					if ev.Fitness(T) < ev.Fitness(S) {
+						S = T
+					}
+				}
+			}
+		}
+	}*/
+}
+
 // Fathers selection (generational)
 func (ev *evolutionaryAlgorithm) SelectTournament() {
 	rand.Seed(time.Now().UnixNano())
@@ -128,7 +157,7 @@ func (ev *evolutionaryAlgorithm) SelectTournament() {
 		father1 := rand.Intn(ev.PopulationSize() + 1)
 		father2 := rand.Intn(ev.PopulationSize() + 1)
 
-		if ev.Fitness(father1) > ev.Fitness(father2) {
+		if ev.Fitness(ev.Population.Individuals[father1]) > ev.Fitness(ev.Population.Individuals[father2]) {
 			p_selection[i] = ev.Population.Individuals[father1]
 		} else {
 			p_selection[i] = ev.Population.Individuals[father2]
@@ -173,9 +202,9 @@ func (ev *evolutionaryAlgorithm) OrderCrossover(crossPoint1, crossPoint2 int) {
 		}
 
 		// Elitism
-		if ev.Fitness(i+i) < bestFather.Fitness {
+		if ev.Fitness(father1) < bestFather.Fitness {
 			bestFather = father1
-		} else if ev.Fitness(i+i+1) < bestFather.Fitness {
+		} else if ev.Fitness(father2) < bestFather.Fitness {
 			bestFather = father2
 		}
 
@@ -204,13 +233,13 @@ func (ev *evolutionaryAlgorithm) Elitism() {
 	worstFitness := -int(^uint(0) >> 1)
 	i_worst := 0
 
-	for i, v := range ev.Population.Individuals {
-		if reflect.DeepEqual(ev.Population.BestFather.Solution, v.Solution) {
+	for i, ind := range ev.Population.Individuals {
+		if reflect.DeepEqual(ev.Population.BestFather.Solution, ind.Solution) {
 			eliteExists = true
 			break
 		}
 
-		if ev.Fitness(i) > worstFitness {
+		if ev.Fitness(ind) > worstFitness {
 			i_worst = i
 		}
 	}
@@ -224,21 +253,20 @@ func (ev *evolutionaryAlgorithm) Evaluate() {
 
 }
 
-func (ev *evolutionaryAlgorithm) Fitness(ind int) int {
-	fitness := ev.Population.Individuals[ind].Fitness
+func (ev *evolutionaryAlgorithm) Fitness(ind *Individual) int {
+	fitness := ind.Fitness
 
-	if ev.Population.Individuals[ind].NeedFitness {
+	if ind.NeedFitness {
 		fitness = 0
-		in := ev.Population.Individuals[ind]
 
 		for i := 0; i < ev.n; i++ {
 			for j := 0; j < ev.n; j++ {
-				fitness += ev.A[i][j] * ev.B[in.Solution[i]][in.Solution[j]]
+				fitness += ev.A[i][j] * ev.B[ind.Solution[i]][ind.Solution[j]]
 			}
 		}
 
 		ev.Population.Evaluations++
-		ev.Population.Individuals[ind].NeedFitness = false
+		ind.NeedFitness = false
 	}
 
 	return fitness
@@ -248,10 +276,10 @@ func (ev *evolutionaryAlgorithm) BestSolution() ([]int, int) {
 	solution := make([]int, ev.n)
 	fitness := int(^uint(0) >> 1)
 
-	for i := range ev.Population.Individuals {
-		if ev.Fitness(i) < fitness {
-			fitness = ev.Fitness(i)
-			solution = ev.Population.Individuals[i].Solution
+	for _, ind := range ev.Population.Individuals {
+		if ev.Fitness(ind) < fitness {
+			fitness = ev.Fitness(ind)
+			copy(solution, ind.Solution)
 		}
 	}
 
