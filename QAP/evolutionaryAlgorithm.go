@@ -55,6 +55,7 @@ func NewPopulation(individuals, generations, solSize int) *Population {
 
 	for i := 0; i < individuals; i++ {
 		var ind *Individual = NewIndividual(solSize)
+		ind.NeedFitness = true
 		j := 0
 		for j != solSize {
 			val := rand.Intn(solSize)
@@ -86,7 +87,7 @@ func NewIndividual(solSize int) *Individual {
 		sols[i] = -1
 	}
 
-	return &Individual{sols, 0, false}
+	return &Individual{sols, 0, true}
 }
 
 func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
@@ -127,25 +128,35 @@ func (ev *evolutionaryAlgorithm) PopulationSize() int {
 
 // Optimization for all individuals
 func (ev *evolutionaryAlgorithm) twoOpt() {
-	/*for _, S := range ev.Population.Individuals {
+	for _, S := range ev.Population.Individuals {
 		optimized := false
 
 		// Keep iterating n times or until the individual is improved
 		for it := 0; it < ev.n && !optimized; it++ {
-			best := S
+			best := NewIndividual(ev.n)
+			copy(best.Solution, S.Solution)
+			best.NeedFitness = true
 
-			for i := 0; i < ev.n-1; i++ {
+			for i := 0; i < ev.n; i++ {
 				for j := i + 1; j < ev.n; j++ {
 					T := NewIndividual(ev.n)
 					copy(T.Solution, S.Solution)
 
+					T.Solution[i], T.Solution[j] = T.Solution[j], T.Solution[i]
+					T.NeedFitness = true
+
 					if ev.Fitness(T) < ev.Fitness(S) {
-						S = T
+						copy(S.Solution, T.Solution)
+						S.NeedFitness = true
+
+						if ev.Fitness(S) < ev.Fitness(best) {
+							optimized = true
+						}
 					}
 				}
 			}
 		}
-	}*/
+	}
 }
 
 // Fathers selection (generational)
@@ -203,9 +214,11 @@ func (ev *evolutionaryAlgorithm) OrderCrossover(crossPoint1, crossPoint2 int) {
 
 		// Elitism
 		if ev.Fitness(father1) < bestFather.Fitness {
-			bestFather = father1
+			copy(bestFather.Solution, father1.Solution)
+			bestFather.NeedFitness = true
 		} else if ev.Fitness(father2) < bestFather.Fitness {
-			bestFather = father2
+			copy(bestFather.Solution, father2.Solution)
+			bestFather.NeedFitness = true
 		}
 
 		son1.NeedFitness = true
@@ -213,7 +226,7 @@ func (ev *evolutionaryAlgorithm) OrderCrossover(crossPoint1, crossPoint2 int) {
 		p_cross = append(p_cross, son1, son2)
 	}
 
-	ev.Population.Individuals = p_cross
+	copy(ev.Population.Individuals, p_cross)
 }
 
 func (ev *evolutionaryAlgorithm) ExchangeMutation(point1, point2 int) {
@@ -266,6 +279,7 @@ func (ev *evolutionaryAlgorithm) Fitness(ind *Individual) int {
 		}
 
 		ev.Population.Evaluations++
+		ind.Fitness = fitness
 		ind.NeedFitness = false
 	}
 
