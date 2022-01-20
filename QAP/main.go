@@ -21,8 +21,21 @@ func fitnessDifference(c int) float32 {
 
 func main() {
 	data := "chr12a.dat"
-	individuals, _ := strconv.Atoi(os.Args[1])
-	generations, _ := strconv.Atoi(os.Args[2])
+	var individuals, generations int
+
+	if len(os.Args) != 3 {
+		fmt.Println("There are no arguments..")
+		fmt.Println("Default individuals: 100")
+		fmt.Println("Default generations: 100")
+		fmt.Println("Usage for the next time:", os.Args[0], "individuals generations")
+		fmt.Println("")
+
+		individuals = 100
+		generations = 100
+	} else {
+		individuals, _ = strconv.Atoi(os.Args[1])
+		generations, _ = strconv.Atoi(os.Args[2])
+	}
 
 	// Run evolutionary algorithm
 	ev, err := NewEvolutionaryAlgorithm(data, individuals, generations)
