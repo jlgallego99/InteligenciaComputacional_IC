@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"math/rand"
 	"reflect"
@@ -106,19 +107,16 @@ func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
 }
 
 func (ev *evolutionaryAlgorithm) genericAlgorithm() {
-	rand.Seed(time.Now().UnixNano())
-
 	// Loop for generations
+	fmt.Println("Generation: ")
 	for t := 0; t < ev.Population.Generations; t++ {
+		fmt.Print(t, " ")
+
 		ev.SelectTournament()
 
-		crossPoint1 := rand.Intn(ev.n)
-		crossPoint2 := rand.Intn(ev.n-crossPoint1) + crossPoint1
-		ev.OrderCrossover(crossPoint1, crossPoint2)
+		ev.OrderCrossover()
 
-		point1 := rand.Intn(ev.n)
-		point2 := rand.Intn(ev.n-point1) + point1
-		ev.ExchangeMutation(point1, point2)
+		ev.ExchangeMutation()
 
 		ev.twoOpt()
 	}
@@ -170,33 +168,48 @@ func (ev *evolutionaryAlgorithm) twoOpt() {
 // Fathers selection (generational)
 func (ev *evolutionaryAlgorithm) SelectTournament() {
 	rand.Seed(time.Now().UnixNano())
-	p_selection := make([]*Individual, ev.PopulationSize())
+	p_selection := make([]*Individual, 0)
 
-	for i := range ev.Population.Individuals {
+	for range ev.Population.Individuals {
 		father1 := rand.Intn(ev.PopulationSize())
 		father2 := rand.Intn(ev.PopulationSize())
 
-		if ev.Fitness(ev.Population.Individuals[father1]) > ev.Fitness(ev.Population.Individuals[father2]) {
-			p_selection[i] = ev.Population.Individuals[father1]
+		if ev.Fitness(ev.Population.Individuals[father1]) < ev.Fitness(ev.Population.Individuals[father2]) {
+			newFather := NewIndividual(ev.n)
+			copy(newFather.Solution, ev.Population.Individuals[father1].Solution)
+			newFather.NeedFitness = true
+			p_selection = append(p_selection, newFather)
 		} else {
-			p_selection[i] = ev.Population.Individuals[father2]
+			newFather := NewIndividual(ev.n)
+			copy(newFather.Solution, ev.Population.Individuals[father2].Solution)
+			newFather.NeedFitness = true
+			p_selection = append(p_selection, newFather)
 		}
 	}
 
 	copy(ev.Population.Individuals, p_selection)
 }
 
-func (ev *evolutionaryAlgorithm) OrderCrossover(crossPoint1, crossPoint2 int) {
+func (ev *evolutionaryAlgorithm) OrderCrossover() {
+	rand.Seed(time.Now().UnixNano())
 	probCross := 0.8
 	numIndividuals := int(math.Ceil(float64(ev.PopulationSize()) * probCross))
 	p_cross := make([]*Individual, 0)
-	bestFather := ev.Population.Individuals[0]
+	bestFather := NewIndividual(ev.n)
+	copy(bestFather.Solution, ev.Population.Individuals[0].Solution)
+	bestFather.NeedFitness = true
 
 	for i := 0; i < numIndividuals/2; i++ {
 		son1 := NewIndividual(ev.n)
 		son2 := NewIndividual(ev.n)
-		father1 := ev.Population.Individuals[i+i]
-		father2 := ev.Population.Individuals[i+i+1]
+		father1 := NewIndividual(ev.n)
+		father2 := NewIndividual(ev.n)
+		copy(father1.Solution, ev.Population.Individuals[i+i].Solution)
+		copy(father2.Solution, ev.Population.Individuals[i+i+1].Solution)
+		father1.NeedFitness = true
+		father2.NeedFitness = true
+		crossPoint1 := rand.Intn(ev.n)
+		crossPoint2 := rand.Intn(ev.n-crossPoint1) + crossPoint1
 
 		copy(son1.Solution[crossPoint1:crossPoint2+1%ev.n], father1.Solution[crossPoint1:crossPoint2+1%ev.n])
 		copy(son2.Solution[crossPoint1:crossPoint2+1%ev.n], father2.Solution[crossPoint1:crossPoint2+1%ev.n])
@@ -238,10 +251,13 @@ func (ev *evolutionaryAlgorithm) OrderCrossover(crossPoint1, crossPoint2 int) {
 	copy(ev.Population.Individuals, p_cross)
 }
 
-func (ev *evolutionaryAlgorithm) ExchangeMutation(point1, point2 int) {
+func (ev *evolutionaryAlgorithm) ExchangeMutation() {
 	rand.Seed(time.Now().UnixNano())
 
 	for _, ind := range ev.Population.Individuals {
+		point1 := rand.Intn(ev.n)
+		point2 := rand.Intn(ev.n-point1) + point1
+
 		// 5% chance of mutation
 		if rand.Float64() < 0.05 {
 			ind.Solution[point1], ind.Solution[point2] = ind.Solution[point2], ind.Solution[point1]
