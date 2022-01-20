@@ -51,11 +51,11 @@ func TestExchangeMutation(t *testing.T) {
 		t.Errorf("Expected %v, got %v", 2, ev.PopulationSize())
 	}
 
-	if !reflect.DeepEqual(ev.Population.Individuals[0].Solution, mut1) {
-		t.Errorf("Expected %v, got %v", son1, ev.Population.Individuals[0].Solution)
+	if !reflect.DeepEqual(ev.Population.Individuals[0].Solution, mut1) && !ev.Population.Individuals[0].NeedFitness {
+		t.Errorf("Expected %v, got %v", mut1, ev.Population.Individuals[0].Solution)
 	}
 
-	if !reflect.DeepEqual(ev.Population.Individuals[1].Solution, mut2) {
-		t.Errorf("Expected %v, got %v", son2, ev.Population.Individuals[1].Solution)
+	if !reflect.DeepEqual(ev.Population.Individuals[1].Solution, mut2) && !ev.Population.Individuals[1].NeedFitness {
+		t.Errorf("Expected %v, got %v", mut2, ev.Population.Individuals[1].Solution)
 	}
 }

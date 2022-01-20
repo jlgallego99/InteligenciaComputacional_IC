@@ -95,21 +95,24 @@ func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
 
 	switch alg {
 	case Generic:
-		genericAlgorithm()
+		ev.genericAlgorithm()
 	case Baldwinian:
-		baldwinianAlgorithm()
+		ev.baldwinianAlgorithm()
 	case Lamarckian:
-		lamarckianAlgorithm()
+		ev.lamarckianAlgorithm()
 	}
 }
 
-func genericAlgorithm() {
+func (ev *evolutionaryAlgorithm) genericAlgorithm() {
+	/*rand.Seed(time.Now().UnixNano())
+	crossPoint1 := rand.Intn(ev.n)
+	crossPoint2 := rand.Intn(ev.n-crossPoint1) + crossPoint1*/
 }
 
-func baldwinianAlgorithm() {
+func (ev *evolutionaryAlgorithm) baldwinianAlgorithm() {
 }
 
-func lamarckianAlgorithm() {
+func (ev *evolutionaryAlgorithm) lamarckianAlgorithm() {
 }
 
 func (ev *evolutionaryAlgorithm) PopulationSize() int {
@@ -140,10 +143,6 @@ func (ev *evolutionaryAlgorithm) OrderCrossover(crossPoint1, crossPoint2 int) {
 	numIndividuals := int(math.Ceil(float64(ev.PopulationSize()) * probCross))
 	p_cross := make([]*Individual, 0)
 	bestFather := ev.Population.Individuals[0]
-
-	//rand.Seed(time.Now().UnixNano())
-	//rand.Intn(ev.n)
-	//rand.Intn(ev.n-crossPoint1) + crossPoint1
 
 	for i := 0; i < numIndividuals-1; i++ {
 		son1 := NewIndividual(ev.n)
