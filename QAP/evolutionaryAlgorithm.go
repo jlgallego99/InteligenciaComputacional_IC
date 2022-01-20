@@ -165,8 +165,8 @@ func (ev *evolutionaryAlgorithm) SelectTournament() {
 	p_selection := make([]*Individual, ev.PopulationSize())
 
 	for i := range ev.Population.Individuals {
-		father1 := rand.Intn(ev.PopulationSize() + 1)
-		father2 := rand.Intn(ev.PopulationSize() + 1)
+		father1 := rand.Intn(ev.PopulationSize())
+		father2 := rand.Intn(ev.PopulationSize())
 
 		if ev.Fitness(ev.Population.Individuals[father1]) > ev.Fitness(ev.Population.Individuals[father2]) {
 			p_selection[i] = ev.Population.Individuals[father1]
@@ -175,7 +175,7 @@ func (ev *evolutionaryAlgorithm) SelectTournament() {
 		}
 	}
 
-	ev.Population.Individuals = p_selection
+	copy(ev.Population.Individuals, p_selection)
 }
 
 func (ev *evolutionaryAlgorithm) OrderCrossover(crossPoint1, crossPoint2 int) {
@@ -260,10 +260,6 @@ func (ev *evolutionaryAlgorithm) Elitism() {
 	if !eliteExists {
 		ev.Population.Individuals[i_worst] = ev.Population.BestFather
 	}
-}
-
-func (ev *evolutionaryAlgorithm) Evaluate() {
-
 }
 
 func (ev *evolutionaryAlgorithm) Fitness(ind *Individual) int {

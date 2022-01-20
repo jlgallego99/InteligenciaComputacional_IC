@@ -83,6 +83,14 @@ var A2 = [][]int{{0, 10, 30}, {10, 0, 20}, {30, 20, 0}}
 var B2 = [][]int{{0, 1, 2}, {1, 0, 1}, {2, 1, 0}}
 var ev2 = &evolutionaryAlgorithm{population2, 3, A2, B2}
 
+func TestSelectTournament(t *testing.T) {
+	ev2.SelectTournament()
+
+	if ev2.PopulationSize() != 3 {
+		t.Errorf("Expected %v, got %v", 3, ev2.PopulationSize())
+	}
+}
+
 func TestTwoOpt(t *testing.T) {
 	oldfit1 := ev2.Fitness(ev2.Population.Individuals[0])
 	oldfit2 := ev2.Fitness(ev2.Population.Individuals[1])
