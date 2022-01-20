@@ -116,6 +116,10 @@ func (ev *evolutionaryAlgorithm) genericAlgorithm() {
 		crossPoint2 := rand.Intn(ev.n-crossPoint1) + crossPoint1
 		ev.OrderCrossover(crossPoint1, crossPoint2)
 
+		point1 := rand.Intn(ev.n)
+		point2 := rand.Intn(ev.n-point1) + point1
+		ev.ExchangeMutation(point1, point2)
+
 		ev.twoOpt()
 	}
 }
