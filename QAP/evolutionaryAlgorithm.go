@@ -110,16 +110,18 @@ func (ev *evolutionaryAlgorithm) genericAlgorithm() {
 	// Loop for generations
 	fmt.Println("Generation: ")
 	for t := 0; t < ev.Population.Generations; t++ {
-		fmt.Print(t, " ")
-
 		ev.SelectTournament()
 
 		ev.OrderCrossover()
 
 		ev.ExchangeMutation()
 
-		ev.twoOpt()
+		//ev.twoOpt()
+
+		_, fitness := ev.BestSolution()
+		fmt.Println(t, fitness)
 	}
+	fmt.Println("")
 }
 
 func (ev *evolutionaryAlgorithm) baldwinianAlgorithm() {
@@ -136,12 +138,13 @@ func (ev *evolutionaryAlgorithm) PopulationSize() int {
 func (ev *evolutionaryAlgorithm) twoOpt() {
 	for _, S := range ev.Population.Individuals {
 		optimized := false
+		best := NewIndividual(ev.n)
 
-		// Keep iterating n times or until the individual is improved
+		// Keep iterating n times or until the individual can't be optimized more
 		for it := 0; it < ev.n && !optimized; it++ {
-			best := NewIndividual(ev.n)
 			copy(best.Solution, S.Solution)
-			best.NeedFitness = true
+			best.Fitness = S.Fitness
+			best.NeedFitness = false
 
 			for i := 0; i < ev.n; i++ {
 				for j := i + 1; j < ev.n; j++ {
@@ -153,14 +156,13 @@ func (ev *evolutionaryAlgorithm) twoOpt() {
 
 					if ev.Fitness(T) < ev.Fitness(S) {
 						copy(S.Solution, T.Solution)
-						S.NeedFitness = true
-
-						if ev.Fitness(S) < ev.Fitness(best) {
-							optimized = true
-						}
+						S.Fitness = T.Fitness
+						S.NeedFitness = false
 					}
 				}
 			}
+
+			optimized = ev.Fitness(best) == ev.Fitness(S)
 		}
 	}
 }

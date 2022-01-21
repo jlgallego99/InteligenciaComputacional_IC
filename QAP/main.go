@@ -10,7 +10,7 @@ import (
 const bestKnownFitness int = 44759294
 
 func fitnessDifference(c int) float32 {
-	difference := float32(5.0 - 100.0*(c-bestKnownFitness)/bestKnownFitness)
+	difference := 5.0 - 100.0*(float32(c)-float32(bestKnownFitness))/float32(bestKnownFitness)
 
 	if difference < 0 {
 		difference = 0.0
@@ -20,7 +20,7 @@ func fitnessDifference(c int) float32 {
 }
 
 func main() {
-	data := "chr12a.dat"
+	data := "tai256c.dat"
 	var individuals, generations int
 
 	if len(os.Args) != 3 {
@@ -31,7 +31,7 @@ func main() {
 		fmt.Println("")
 
 		individuals = 100
-		generations = 100
+		generations = 10
 	} else {
 		individuals, _ = strconv.Atoi(os.Args[1])
 		generations, _ = strconv.Atoi(os.Args[2])
@@ -59,7 +59,7 @@ func main() {
 	fmt.Println("Time (seconds):", end.Seconds())
 	fmt.Println("Solution:", solution)
 	fmt.Println("Fitness:", fitness)
-	fmt.Println("Fitness difference from best known:", fitnessDifference(fitness))
+	fmt.Println("Score from best known solution:", fitnessDifference(fitness))
 
 	// Baldwinian algorithm solution
 	/*start = time.Now()
