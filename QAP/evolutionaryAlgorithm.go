@@ -100,7 +100,10 @@ func NewIndividual(solSize int) *Individual {
 func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
 	// Initial population
 	ev.Population = NewPopulation(ev.PopulationSize(), ev.Population.Generations, ev.n)
-	//ev.twoOpt()
+
+	if alg == Lamarckian || alg == Baldwinian {
+		ev.twoOpt(alg)
+	}
 
 	// Results file
 	name := ""
@@ -131,7 +134,7 @@ func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
 		ev.Elitism()
 
 		if alg == Baldwinian || alg == Lamarckian {
-			ev.twoOpt()
+			ev.twoOpt(alg)
 		}
 
 		ev.saveBestIndividual()
@@ -164,7 +167,7 @@ func (ev *evolutionaryAlgorithm) PopulationSize() int {
 }
 
 // Optimization for all individuals
-func (ev *evolutionaryAlgorithm) twoOpt() {
+func (ev *evolutionaryAlgorithm) twoOpt(alg algorithmType) {
 	// Mirar hacer concurrente
 
 	for _, S := range ev.Population.Individuals {
@@ -191,7 +194,11 @@ func (ev *evolutionaryAlgorithm) twoOpt() {
 					T.NeedFitness = false
 
 					if ev.Fitness(T) < ev.Fitness(S) {
-						copy(S.Solution, T.Solution)
+						// Lamarckian: inherit solution
+						if alg == Lamarckian {
+							copy(S.Solution, T.Solution)
+						}
+
 						S.Fitness = T.Fitness
 						S.NeedFitness = false
 					}

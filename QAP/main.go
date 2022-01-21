@@ -24,7 +24,7 @@ func main() {
 	var alg, individuals, generations int
 
 	if len(os.Args) != 4 {
-		fmt.Println("There are no arguments..")
+		fmt.Println("Incorrect arguments...")
 		fmt.Println("Default algorithm: generic")
 		fmt.Println("Default individuals: 100")
 		fmt.Println("Default generations: 100")
@@ -33,7 +33,7 @@ func main() {
 		fmt.Println("")
 
 		individuals = 100
-		generations = 10
+		generations = 100
 	} else {
 		alg, _ = strconv.Atoi(os.Args[1])
 		individuals, _ = strconv.Atoi(os.Args[2])
