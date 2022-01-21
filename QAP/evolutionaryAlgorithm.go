@@ -102,6 +102,22 @@ func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
 	ev.Population = NewPopulation(ev.PopulationSize(), ev.Population.Generations, ev.n)
 	//ev.twoOpt()
 
+	// Results file
+	name := ""
+	switch alg {
+	case Generic:
+		name += "generic_" + strconv.Itoa(ev.PopulationSize()) + "_" + strconv.Itoa(ev.Population.Generations) + ".txt"
+
+	case Baldwinian:
+		name += "baldwinian_" + strconv.Itoa(ev.PopulationSize()) + "_" + strconv.Itoa(ev.Population.Generations) + ".txt"
+
+	case Lamarckian:
+		name += "lamarckian_" + strconv.Itoa(ev.PopulationSize()) + "_" + strconv.Itoa(ev.Population.Generations) + ".txt"
+
+	}
+	f := OpenResultsFile(name)
+	defer f.Close()
+
 	// Loop for generations
 	fmt.Println("Generation: ")
 	ev.saveBestIndividual()
@@ -123,20 +139,7 @@ func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
 		_, fitness := ev.BestSolution()
 		fmt.Println(t, fitness)
 
-		name := ""
-		switch alg {
-		case Generic:
-			name += "generic_" + strconv.Itoa(ev.PopulationSize()) + "_" + strconv.Itoa(ev.Population.Generations) + ".txt"
-
-		case Baldwinian:
-			name += "baldwinian_" + strconv.Itoa(ev.PopulationSize()) + "_" + strconv.Itoa(ev.Population.Generations) + ".txt"
-
-		case Lamarckian:
-			name += "lamarckian_" + strconv.Itoa(ev.PopulationSize()) + "_" + strconv.Itoa(ev.Population.Generations) + ".txt"
-
-		}
-
-		WriteResults(t, fitness, name)
+		WriteResults(t, fitness, f)
 	}
 	fmt.Println("")
 }
@@ -183,8 +186,8 @@ func (ev *evolutionaryAlgorithm) twoOpt() {
 					T.NeedFitness = false
 
 					T.Solution[i], T.Solution[j] = T.Solution[j], T.Solution[i]
-					//ev.RecalculateFitness(T, S, i, j)
-					T.NeedFitness = true
+					ev.RecalculateFitness(T, S, i, j)
+					T.NeedFitness = false
 
 					if ev.Fitness(T) < ev.Fitness(S) {
 						copy(S.Solution, T.Solution)
