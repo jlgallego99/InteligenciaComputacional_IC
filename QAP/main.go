@@ -52,7 +52,7 @@ func main() {
 
 	// Generic algorithm solution
 	start := time.Now()
-	ev.Run(Generic)
+	ev.Run(Baldwinian)
 	end := time.Since(start)
 	solution, fitness := ev.BestSolution()
 	fmt.Println("GENERIC ALGORITHM")

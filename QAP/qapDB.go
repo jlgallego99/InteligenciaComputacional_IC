@@ -70,3 +70,13 @@ func ReadData(name string) (int, [][]int, [][]int, error) {
 
 	return n, A, B, nil
 }
+
+func WriteResults(generation, fitness int, name string) {
+	f, err := os.Create("/result/" + name)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	f.WriteString(strconv.Itoa(generation) + " " + strconv.Itoa(fitness))
+}

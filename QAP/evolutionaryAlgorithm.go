@@ -6,6 +6,7 @@ import (
 	"math"
 	"math/rand"
 	"reflect"
+	"strconv"
 	"time"
 )
 
@@ -97,18 +98,47 @@ func NewIndividual(solSize int) *Individual {
 }
 
 func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
-	// Optimized initial population
+	// Initial population
 	ev.Population = NewPopulation(ev.PopulationSize(), ev.Population.Generations, ev.n)
-	ev.twoOpt()
+	//ev.twoOpt()
 
-	switch alg {
-	case Generic:
-		ev.genericAlgorithm()
-	case Baldwinian:
-		ev.baldwinianAlgorithm()
-	case Lamarckian:
-		ev.lamarckianAlgorithm()
+	// Loop for generations
+	fmt.Println("Generation: ")
+	ev.saveBestIndividual()
+	for t := 0; t < ev.Population.Generations; t++ {
+		ev.SelectTournament()
+
+		ev.OrderCrossover()
+
+		ev.ExchangeMutation()
+
+		ev.Elitism()
+
+		if alg == Baldwinian || alg == Lamarckian {
+			ev.twoOpt()
+		}
+
+		ev.saveBestIndividual()
+
+		_, fitness := ev.BestSolution()
+		fmt.Println(t, fitness)
+
+		name := ""
+		switch alg {
+		case Generic:
+			name += "generic_" + strconv.Itoa(ev.PopulationSize()) + "_" + strconv.Itoa(ev.Population.Generations) + ".txt"
+
+		case Baldwinian:
+			name += "baldwinian_" + strconv.Itoa(ev.PopulationSize()) + "_" + strconv.Itoa(ev.Population.Generations) + ".txt"
+
+		case Lamarckian:
+			name += "lamarckian_" + strconv.Itoa(ev.PopulationSize()) + "_" + strconv.Itoa(ev.Population.Generations) + ".txt"
+
+		}
+
+		WriteResults(t, fitness, name)
 	}
+	fmt.Println("")
 }
 
 func (ev *evolutionaryAlgorithm) saveBestIndividual() {
@@ -123,35 +153,6 @@ func (ev *evolutionaryAlgorithm) saveBestIndividual() {
 			ev.Population.BestFather.NeedFitness = false
 		}
 	}
-}
-
-func (ev *evolutionaryAlgorithm) genericAlgorithm() {
-	// Loop for generations
-	fmt.Println("Generation: ")
-	ev.saveBestIndividual()
-	for t := 0; t < ev.Population.Generations; t++ {
-		ev.SelectTournament()
-
-		ev.OrderCrossover()
-
-		ev.ExchangeMutation()
-
-		ev.Elitism()
-
-		//ev.twoOpt()
-
-		ev.saveBestIndividual()
-
-		_, fitness := ev.BestSolution()
-		fmt.Println(t, fitness)
-	}
-	fmt.Println("")
-}
-
-func (ev *evolutionaryAlgorithm) baldwinianAlgorithm() {
-}
-
-func (ev *evolutionaryAlgorithm) lamarckianAlgorithm() {
 }
 
 func (ev *evolutionaryAlgorithm) PopulationSize() int {
@@ -182,8 +183,8 @@ func (ev *evolutionaryAlgorithm) twoOpt() {
 					T.NeedFitness = false
 
 					T.Solution[i], T.Solution[j] = T.Solution[j], T.Solution[i]
-					ev.RecalculateFitness(T, S, i, j)
-					T.NeedFitness = false
+					//ev.RecalculateFitness(T, S, i, j)
+					T.NeedFitness = true
 
 					if ev.Fitness(T) < ev.Fitness(S) {
 						copy(S.Solution, T.Solution)
@@ -287,8 +288,8 @@ func (ev *evolutionaryAlgorithm) ExchangeMutation() {
 		point1 := rand.Intn(ev.n)
 		point2 := rand.Intn(ev.n-point1) + point1
 
-		// 5% chance of mutation
-		if rand.Float64() < 0.05 {
+		// 50% chance of mutation
+		if rand.Float64() < 0.5 {
 			ind.Solution[point1], ind.Solution[point2] = ind.Solution[point2], ind.Solution[point1]
 			ind.NeedFitness = true
 		}
