@@ -1,14 +1,15 @@
 package main
 
 import (
+	"math/rand"
 	"reflect"
 	"testing"
 )
 
 var father1 []int = []int{1, 0, 4, 2, 6, 5, 3}
 var father2 []int = []int{3, 1, 2, 0, 5, 6, 4}
-var son1 []int = []int{0, 5, 4, 2, 6, 3, 1}
-var son2 []int = []int{4, 6, 2, 0, 5, 3, 1}
+var son1 []int = []int{1, 0, 4, 2, 5, 6, 3}
+var son2 []int = []int{1, 4, 2, 0, 6, 5, 3}
 var mut1 []int = []int{0, 5, 6, 2, 4, 3, 1}
 var mut2 []int = []int{4, 6, 5, 0, 2, 3, 1}
 var population *Population = &Population{[]*Individual{{father1, 0, true}, {father2, 0, true}}, 5, 0, nil}
@@ -47,7 +48,8 @@ func TestNewPopulation(t *testing.T) {
 }
 
 func TestOrderCrossover(t *testing.T) {
-	ev.OrderCrossover(2, 4)
+	rand.Seed(5)
+	ev.OrderCrossover()
 
 	if ev.PopulationSize() != 2 {
 		t.Errorf("Expected %v, got %v", 2, ev.PopulationSize())
@@ -63,7 +65,8 @@ func TestOrderCrossover(t *testing.T) {
 }
 
 func TestExchangeMutation(t *testing.T) {
-	ev.ExchangeMutation(2, 4)
+	rand.Seed(1)
+	ev.ExchangeMutation()
 
 	if ev.PopulationSize() != 2 {
 		t.Errorf("Expected %v, got %v", 2, ev.PopulationSize())

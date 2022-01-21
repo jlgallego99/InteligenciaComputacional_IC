@@ -38,6 +38,8 @@ type Individual struct {
 }
 
 func NewEvolutionaryAlgorithm(data string, individuals, generations int) (*evolutionaryAlgorithm, error) {
+	rand.Seed(time.Now().UnixNano())
+
 	// Read QAP problem
 	n, A, B, err := ReadData(data)
 	if err != nil {
@@ -51,7 +53,6 @@ func NewEvolutionaryAlgorithm(data string, individuals, generations int) (*evolu
 }
 
 func NewPopulation(individuals, generations, solSize int) *Population {
-	rand.Seed(time.Now().UnixNano())
 	p := &Population{make([]*Individual, 0), generations, 0, nil}
 
 	for i := 0; i < individuals; i++ {
@@ -169,7 +170,6 @@ func (ev *evolutionaryAlgorithm) twoOpt() {
 
 // Fathers selection (generational)
 func (ev *evolutionaryAlgorithm) SelectTournament() {
-	rand.Seed(time.Now().UnixNano())
 	p_selection := make([]*Individual, 0)
 
 	for range ev.Population.Individuals {
@@ -193,7 +193,6 @@ func (ev *evolutionaryAlgorithm) SelectTournament() {
 }
 
 func (ev *evolutionaryAlgorithm) OrderCrossover() {
-	rand.Seed(time.Now().UnixNano())
 	probCross := 0.8
 	numIndividuals := int(math.Ceil(float64(ev.PopulationSize()) * probCross))
 	p_cross := make([]*Individual, 0)
@@ -254,8 +253,6 @@ func (ev *evolutionaryAlgorithm) OrderCrossover() {
 }
 
 func (ev *evolutionaryAlgorithm) ExchangeMutation() {
-	rand.Seed(time.Now().UnixNano())
-
 	for _, ind := range ev.Population.Individuals {
 		point1 := rand.Intn(ev.n)
 		point2 := rand.Intn(ev.n-point1) + point1
