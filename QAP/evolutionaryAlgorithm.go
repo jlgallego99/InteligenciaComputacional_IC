@@ -146,6 +146,7 @@ func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
 
 func (ev *evolutionaryAlgorithm) saveBestIndividual() {
 	copy(ev.Population.BestFather.Solution, ev.Population.Individuals[0].Solution)
+	ev.Fitness(ev.Population.Individuals[0])
 	ev.Population.BestFather.Fitness = ev.Population.Individuals[0].Fitness
 	ev.Population.BestFather.NeedFitness = false
 
@@ -197,14 +198,7 @@ func (ev *evolutionaryAlgorithm) twoOpt() {
 				}
 			}
 
-			optimized = ev.Fitness(best) == ev.Fitness(S)
-		}
-
-		a := S.Fitness
-		S.NeedFitness = true
-		if a != ev.Fitness(S) {
-			fmt.Println(a, S.Fitness)
-			panic("Error")
+			optimized = ev.Fitness(best) > ev.Fitness(S)
 		}
 	}
 }
@@ -216,6 +210,9 @@ func (ev *evolutionaryAlgorithm) SelectTournament() {
 	for range ev.Population.Individuals {
 		father1 := rand.Intn(ev.PopulationSize())
 		father2 := rand.Intn(ev.PopulationSize())
+		for father2 != father1 {
+			father2 = rand.Intn(ev.PopulationSize())
+		}
 
 		if ev.Fitness(ev.Population.Individuals[father1]) < ev.Fitness(ev.Population.Individuals[father2]) {
 			newFather := NewIndividual(ev.n)
@@ -276,8 +273,6 @@ func (ev *evolutionaryAlgorithm) OrderCrossover() {
 			}
 		}
 
-		// Elitism
-
 		son1.NeedFitness = true
 		son2.NeedFitness = true
 		p_cross = append(p_cross, son1, son2)
@@ -291,8 +286,8 @@ func (ev *evolutionaryAlgorithm) ExchangeMutation() {
 		point1 := rand.Intn(ev.n)
 		point2 := rand.Intn(ev.n-point1) + point1
 
-		// 50% chance of mutation
-		if rand.Float64() < 0.5 {
+		// 25% chance of mutation
+		if rand.Float64() < 0.25 {
 			ind.Solution[point1], ind.Solution[point2] = ind.Solution[point2], ind.Solution[point1]
 			ind.NeedFitness = true
 		}
