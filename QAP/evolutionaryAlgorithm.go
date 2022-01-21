@@ -55,6 +55,8 @@ func NewEvolutionaryAlgorithm(data string, individuals, generations int) (*evolu
 func NewPopulation(individuals, generations, solSize int) *Population {
 	p := &Population{make([]*Individual, 0), generations, 0, nil}
 
+	// Crear vector con valores del 1 al n y hacerle shuffle
+
 	for i := 0; i < individuals; i++ {
 		var ind *Individual = NewIndividual(solSize)
 		ind.NeedFitness = true
@@ -78,6 +80,8 @@ func NewPopulation(individuals, generations, solSize int) *Population {
 
 		p.Individuals = append(p.Individuals, ind)
 	}
+
+	p.BestFather = NewIndividual(solSize)
 
 	return p
 }
@@ -107,9 +111,24 @@ func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
 	}
 }
 
+func (ev *evolutionaryAlgorithm) saveBestIndividual() {
+	copy(ev.Population.BestFather.Solution, ev.Population.Individuals[0].Solution)
+	ev.Population.BestFather.Fitness = ev.Population.Individuals[0].Fitness
+	ev.Population.BestFather.NeedFitness = false
+
+	for _, ind := range ev.Population.Individuals {
+		if ev.Fitness(ind) < ev.Population.BestFather.Fitness {
+			copy(ev.Population.BestFather.Solution, ind.Solution)
+			ev.Population.BestFather.Fitness = ind.Fitness
+			ev.Population.BestFather.NeedFitness = false
+		}
+	}
+}
+
 func (ev *evolutionaryAlgorithm) genericAlgorithm() {
 	// Loop for generations
 	fmt.Println("Generation: ")
+	ev.saveBestIndividual()
 	for t := 0; t < ev.Population.Generations; t++ {
 		ev.SelectTournament()
 
@@ -117,7 +136,11 @@ func (ev *evolutionaryAlgorithm) genericAlgorithm() {
 
 		ev.ExchangeMutation()
 
+		ev.Elitism()
+
 		//ev.twoOpt()
+
+		ev.saveBestIndividual()
 
 		_, fitness := ev.BestSolution()
 		fmt.Println(t, fitness)
@@ -137,7 +160,11 @@ func (ev *evolutionaryAlgorithm) PopulationSize() int {
 
 // Optimization for all individuals
 func (ev *evolutionaryAlgorithm) twoOpt() {
+	// Mirar hacer concurrente
+
 	for _, S := range ev.Population.Individuals {
+		S.NeedFitness = true
+		ev.Fitness(S)
 		optimized := false
 		best := NewIndividual(ev.n)
 
@@ -151,9 +178,12 @@ func (ev *evolutionaryAlgorithm) twoOpt() {
 				for j := i + 1; j < ev.n; j++ {
 					T := NewIndividual(ev.n)
 					copy(T.Solution, S.Solution)
+					T.Fitness = S.Fitness
+					T.NeedFitness = false
 
 					T.Solution[i], T.Solution[j] = T.Solution[j], T.Solution[i]
-					T.NeedFitness = true
+					ev.RecalculateFitness(T, S, i, j)
+					T.NeedFitness = false
 
 					if ev.Fitness(T) < ev.Fitness(S) {
 						copy(S.Solution, T.Solution)
@@ -164,6 +194,13 @@ func (ev *evolutionaryAlgorithm) twoOpt() {
 			}
 
 			optimized = ev.Fitness(best) == ev.Fitness(S)
+		}
+
+		a := S.Fitness
+		S.NeedFitness = true
+		if a != ev.Fitness(S) {
+			fmt.Println(a, S.Fitness)
+			panic("Error")
 		}
 	}
 }
@@ -236,13 +273,6 @@ func (ev *evolutionaryAlgorithm) OrderCrossover() {
 		}
 
 		// Elitism
-		if ev.Fitness(father1) < bestFather.Fitness {
-			copy(bestFather.Solution, father1.Solution)
-			bestFather.NeedFitness = true
-		} else if ev.Fitness(father2) < bestFather.Fitness {
-			copy(bestFather.Solution, father2.Solution)
-			bestFather.NeedFitness = true
-		}
 
 		son1.NeedFitness = true
 		son2.NeedFitness = true
@@ -267,7 +297,8 @@ func (ev *evolutionaryAlgorithm) ExchangeMutation() {
 
 func (ev *evolutionaryAlgorithm) Elitism() {
 	eliteExists := false
-	worstFitness := -int(^uint(0) >> 1)
+	ev.Fitness(ev.Population.Individuals[0])
+	worstFitness := ev.Population.Individuals[0].Fitness
 	i_worst := 0
 
 	for i, ind := range ev.Population.Individuals {
@@ -277,12 +308,15 @@ func (ev *evolutionaryAlgorithm) Elitism() {
 		}
 
 		if ev.Fitness(ind) > worstFitness {
+			worstFitness = ind.Fitness
 			i_worst = i
 		}
 	}
 
 	if !eliteExists {
-		ev.Population.Individuals[i_worst] = ev.Population.BestFather
+		copy(ev.Population.Individuals[i_worst].Solution, ev.Population.BestFather.Solution)
+		ev.Population.Individuals[i_worst].Fitness = ev.Population.BestFather.Fitness
+		ev.Population.Individuals[i_worst].NeedFitness = false
 	}
 }
 
@@ -294,7 +328,7 @@ func (ev *evolutionaryAlgorithm) Fitness(ind *Individual) int {
 
 		for i := 0; i < ev.n; i++ {
 			for j := 0; j < ev.n; j++ {
-				fitness += ev.A[i][j] * ev.B[ind.Solution[i]][ind.Solution[j]]
+				fitness = fitness + (ev.A[i][j] * ev.B[ind.Solution[i]][ind.Solution[j]])
 			}
 		}
 
@@ -306,18 +340,31 @@ func (ev *evolutionaryAlgorithm) Fitness(ind *Individual) int {
 	return fitness
 }
 
-func (ev *evolutionaryAlgorithm) BestSolution() ([]int, int) {
-	solution := make([]int, ev.n)
-	fitness := int(^uint(0) >> 1)
+func (ev *evolutionaryAlgorithm) RecalculateFitness(ind, S *Individual, pos_a, pos_b int) {
+	newFitness := ind.Fitness
 
-	for _, ind := range ev.Population.Individuals {
-		if ev.Fitness(ind) < fitness {
-			fitness = ev.Fitness(ind)
-			copy(solution, ind.Solution)
+	for i := 0; i < ev.n; i++ {
+		newFitness -= ev.A[pos_a][i] * ev.B[S.Solution[pos_a]][S.Solution[i]]
+		newFitness += ev.A[pos_a][i] * ev.B[ind.Solution[pos_a]][ind.Solution[i]]
+
+		newFitness -= ev.A[pos_b][i] * ev.B[S.Solution[pos_b]][S.Solution[i]]
+		newFitness += ev.A[pos_b][i] * ev.B[ind.Solution[pos_b]][ind.Solution[i]]
+
+		if i != pos_a && i != pos_b {
+			newFitness -= ev.A[i][pos_a] * ev.B[S.Solution[i]][S.Solution[pos_a]]
+			newFitness += ev.A[i][pos_a] * ev.B[ind.Solution[i]][ind.Solution[pos_a]]
+
+			newFitness -= ev.A[i][pos_b] * ev.B[S.Solution[i]][S.Solution[pos_b]]
+			newFitness += ev.A[i][pos_b] * ev.B[ind.Solution[i]][ind.Solution[pos_b]]
 		}
 	}
 
-	return solution, fitness
+	ind.Fitness = newFitness
+	ind.NeedFitness = false
+}
+
+func (ev *evolutionaryAlgorithm) BestSolution() ([]int, int) {
+	return ev.Population.BestFather.Solution, ev.Population.BestFather.Fitness
 }
 
 func contains(s []int, e int) bool {
