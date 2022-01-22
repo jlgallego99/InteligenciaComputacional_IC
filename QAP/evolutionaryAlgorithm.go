@@ -143,21 +143,22 @@ func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
 }
 
 func (ev *evolutionaryAlgorithm) twoOptConcurrent(alg algorithmType) {
-	var wg sync.WaitGroup
 	if alg == Lamarckian || alg == Baldwinian {
-		// Launch 8 threads
-		for i := 0; i < 10; i++ {
-			tam := len(ev.Population.Individuals) / 10
+		var wg sync.WaitGroup
+
+		// Launch threads
+		numThreads := 10
+		for i := 0; i < numThreads; i++ {
+			tam := len(ev.Population.Individuals) / numThreads
 			individuals := make([]*Individual, tam)
 			copy(individuals, ev.Population.Individuals[i*tam:(i*tam)+tam])
 
 			wg.Add(1)
 			go ev.twoOpt(alg, individuals, &wg)
 		}
+
+		wg.Wait()
 	}
-	fmt.Println("Waiting threads...")
-	wg.Wait()
-	fmt.Println("All threads finished")
 }
 
 // Optimization for all individuals
