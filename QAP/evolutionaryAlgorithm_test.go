@@ -99,7 +99,7 @@ func TestTwoOpt(t *testing.T) {
 	oldfit2 := ev2.Fitness(ev2.Population.Individuals[1])
 	oldfit3 := ev2.Fitness(ev2.Population.Individuals[2])
 
-	ev2.twoOpt()
+	ev2.twoOpt(Generic)
 
 	if !(ev2.Fitness(ev2.Population.Individuals[0]) <= oldfit1) {
 		t.Errorf("Fitness not improved: %v < %v", ev2.Fitness(ev2.Population.Individuals[0]), oldfit1)
