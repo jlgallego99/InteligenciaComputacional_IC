@@ -115,8 +115,8 @@ func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
 		name += "lamarckian_" + strconv.Itoa(ev.PopulationSize()) + "_" + strconv.Itoa(ev.Population.Generations) + ".txt"
 
 	}
-	//f := OpenResultsFile(name)
-	//defer f.Close()
+	f := OpenResultsFile(name)
+	defer f.Close()
 
 	// Loop for generations
 	fmt.Println("Generation: ")
@@ -137,7 +137,7 @@ func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
 		_, fitness := ev.BestSolution()
 		fmt.Println(t, fitness)
 
-		//WriteResults(t, fitness, f)
+		WriteResults(t, fitness, f)
 	}
 	fmt.Println("")
 }
@@ -286,6 +286,10 @@ func (ev *evolutionaryAlgorithm) OrderCrossover() {
 		son1.NeedFitness = true
 		son2.NeedFitness = true
 		p_cross = append(p_cross, son1, son2)
+	}
+
+	for i := numIndividuals; i < ev.PopulationSize(); i++ {
+		p_cross = append(p_cross, ev.Population.Individuals[i])
 	}
 
 	copy(ev.Population.Individuals, p_cross)
