@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"reflect"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -98,9 +99,8 @@ func NewIndividual(solSize int) *Individual {
 }
 
 func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
-	if alg == Lamarckian || alg == Baldwinian {
-		ev.twoOpt(alg)
-	}
+	// Start from optimized population
+	ev.twoOptConcurrent(alg)
 
 	// Results file
 	name := ""
@@ -115,8 +115,8 @@ func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
 		name += "lamarckian_" + strconv.Itoa(ev.PopulationSize()) + "_" + strconv.Itoa(ev.Population.Generations) + ".txt"
 
 	}
-	f := OpenResultsFile(name)
-	defer f.Close()
+	//f := OpenResultsFile(name)
+	//defer f.Close()
 
 	// Loop for generations
 	fmt.Println("Generation: ")
@@ -130,44 +130,43 @@ func (ev *evolutionaryAlgorithm) Run(alg algorithmType) {
 
 		ev.Elitism()
 
-		if alg == Baldwinian || alg == Lamarckian {
-			ev.twoOpt(alg)
-		}
+		ev.twoOptConcurrent(alg)
 
 		ev.saveBestIndividual()
 
 		_, fitness := ev.BestSolution()
 		fmt.Println(t, fitness)
 
-		WriteResults(t, fitness, f)
+		//WriteResults(t, fitness, f)
 	}
 	fmt.Println("")
 }
 
-func (ev *evolutionaryAlgorithm) saveBestIndividual() {
-	copy(ev.Population.BestFather.Solution, ev.Population.Individuals[0].Solution)
-	ev.Fitness(ev.Population.Individuals[0])
-	ev.Population.BestFather.Fitness = ev.Fitness(ev.Population.Individuals[0])
-	ev.Population.BestFather.NeedFitness = false
+func (ev *evolutionaryAlgorithm) twoOptConcurrent(alg algorithmType) {
+	var wg sync.WaitGroup
+	if alg == Lamarckian || alg == Baldwinian {
+		// Launch 8 threads
+		for i := 0; i < 10; i++ {
+			tam := len(ev.Population.Individuals) / 10
+			individuals := make([]*Individual, tam)
+			copy(individuals, ev.Population.Individuals[i*tam:(i*tam)+tam])
 
-	for _, ind := range ev.Population.Individuals {
-		if ev.Fitness(ind) < ev.Fitness(ev.Population.BestFather) {
-			copy(ev.Population.BestFather.Solution, ind.Solution)
-			ev.Population.BestFather.Fitness = ev.Fitness(ind)
-			ev.Population.BestFather.NeedFitness = false
+			wg.Add(1)
+			go ev.twoOpt(alg, individuals, &wg)
 		}
 	}
-}
-
-func (ev *evolutionaryAlgorithm) PopulationSize() int {
-	return len(ev.Population.Individuals)
+	fmt.Println("Waiting threads...")
+	wg.Wait()
+	fmt.Println("All threads finished")
 }
 
 // Optimization for all individuals
-func (ev *evolutionaryAlgorithm) twoOpt(alg algorithmType) {
-	// Mirar hacer concurrente
+func (ev *evolutionaryAlgorithm) twoOpt(alg algorithmType, individuals []*Individual, wg *sync.WaitGroup) {
+	if wg != nil {
+		defer wg.Done()
+	}
 
-	for _, ind := range ev.Population.Individuals {
+	for _, ind := range individuals {
 		ev.Fitness(ind)
 		S := NewIndividual(ev.n)
 		copy(S.Solution, ind.Solution)
@@ -304,6 +303,21 @@ func (ev *evolutionaryAlgorithm) ExchangeMutation() {
 	}
 }
 
+func (ev *evolutionaryAlgorithm) saveBestIndividual() {
+	copy(ev.Population.BestFather.Solution, ev.Population.Individuals[0].Solution)
+	ev.Fitness(ev.Population.Individuals[0])
+	ev.Population.BestFather.Fitness = ev.Fitness(ev.Population.Individuals[0])
+	ev.Population.BestFather.NeedFitness = false
+
+	for _, ind := range ev.Population.Individuals {
+		if ev.Fitness(ind) < ev.Fitness(ev.Population.BestFather) {
+			copy(ev.Population.BestFather.Solution, ind.Solution)
+			ev.Population.BestFather.Fitness = ev.Fitness(ind)
+			ev.Population.BestFather.NeedFitness = false
+		}
+	}
+}
+
 func (ev *evolutionaryAlgorithm) Elitism() {
 	eliteExists := false
 	ev.Fitness(ev.Population.Individuals[0])
@@ -351,6 +365,10 @@ func (ev *evolutionaryAlgorithm) Fitness(ind *Individual) int {
 
 func (ev *evolutionaryAlgorithm) BestSolution() ([]int, int) {
 	return ev.Population.BestFather.Solution, ev.Fitness(ev.Population.BestFather)
+}
+
+func (ev *evolutionaryAlgorithm) PopulationSize() int {
+	return len(ev.Population.Individuals)
 }
 
 func contains(s []int, e int) bool {
