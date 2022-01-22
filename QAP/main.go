@@ -20,7 +20,7 @@ func fitnessDifference(c int) float32 {
 }
 
 func main() {
-	data := "chr12c.dat"
+	data := "tai256c.dat"
 	var alg, individuals, generations int
 
 	if len(os.Args) != 4 {

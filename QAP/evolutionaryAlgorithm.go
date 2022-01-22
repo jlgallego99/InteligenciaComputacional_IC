@@ -57,8 +57,6 @@ func NewEvolutionaryAlgorithm(data string, individuals, generations int) (*evolu
 func NewPopulation(individuals, generations, solSize int) *Population {
 	p := &Population{make([]*Individual, 0), generations, 0, nil}
 
-	// Crear vector con valores del 1 al n y hacerle shuffle
-
 	for i := 0; i < individuals; i++ {
 		var ind *Individual = NewIndividual(solSize)
 		ind.NeedFitness = true

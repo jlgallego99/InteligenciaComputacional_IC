@@ -14,5 +14,8 @@ set output "result/evolution_variants.png"
 # columna en eje x : columna en eje y
 set xlabel "Generación"
 set ylabel "Fitness"
-plot "result/baldwinian_10_10.txt" using 1:2 title "Algoritmo baldwiniano" with l lw 4, \
-    "result/lamarckian_50_10.txt" using 1:2 title "Algoritmo lamarckiano" with l lw 4
+plot "result/baldwinian_10_10.txt" using 1:2 title "Algoritmo baldwiniano (10 ind)" with l lw 4, \
+    "result/baldwinian_50_10.txt" using 1:2 title "Algoritmo baldwiniano (50 ind)" with l lw 4, \
+    "result/lamarckian_50_10.txt" using 1:2 title "Algoritmo lamarckiano (50 ind)" with l lw 4, \
+    "result/lamarckian_10_10.txt" using 1:2 title "Algoritmo lamarckiano (10 ind)" with l lw 4, \
+    "result/lamarckian_10_100.txt" using 1:2 title "Algoritmo lamarckiano (10 ind)" with l lw 4
