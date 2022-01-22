@@ -70,3 +70,16 @@ func ReadData(name string) (int, [][]int, [][]int, error) {
 
 	return n, A, B, nil
 }
+
+func OpenResultsFile(name string) *os.File {
+	f, err := os.Create("./result/" + name)
+	if err != nil {
+		panic(err)
+	}
+
+	return f
+}
+
+func WriteResults(generation, fitness int, f *os.File) {
+	f.WriteString(strconv.Itoa(generation) + " " + strconv.Itoa(fitness) + "\n")
+}
