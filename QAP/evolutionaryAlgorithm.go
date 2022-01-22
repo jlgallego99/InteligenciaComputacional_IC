@@ -174,11 +174,11 @@ func (ev *evolutionaryAlgorithm) twoOpt(alg algorithmType) {
 		S.Fitness = ev.Fitness(ind)
 		S.NeedFitness = false
 
-		optimized := true
+		notOptimized := true
 		best := NewIndividual(ev.n)
 
-		// Keep iterating n times or until the individual can't be optimized more
-		for it := 0; it < ev.n && optimized; it++ {
+		// Keep iterating n times or until the individual is optimized
+		for it := 0; it < ev.n && notOptimized; it++ {
 			copy(best.Solution, S.Solution)
 			best.Fitness = ev.Fitness(S)
 			best.NeedFitness = false
@@ -201,7 +201,7 @@ func (ev *evolutionaryAlgorithm) twoOpt(alg algorithmType) {
 				}
 			}
 
-			optimized = ev.Fitness(best) > ev.Fitness(S)
+			notOptimized = ev.Fitness(best) > ev.Fitness(S)
 		}
 
 		// Lamarckian: inherit solution
